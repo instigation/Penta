@@ -1,7 +1,25 @@
 ﻿using System.Collections.Generic;
 using System; // for Abs
 
-public enum Difficulty { EASY = 1, NORMAL = 2, HARD = 3 }
+public enum Difficulty { EASY, NORMAL, HARD }
+public class DifficultyIterator {
+    private Difficulty diff;
+
+    public DifficultyIterator(Difficulty diff) { this.diff = diff; }
+
+    public Difficulty rightPlusPlus() {
+        Difficulty original = diff;
+        diff = (Difficulty)(((int)diff + 1) % 3);
+        return original;
+    }
+    public static List<Difficulty> getAll() {
+        List<Difficulty> ret = new List<Difficulty>();
+        ret.Add(Difficulty.EASY);
+        ret.Add(Difficulty.NORMAL);
+        ret.Add(Difficulty.HARD);
+        return ret;
+    }
+}
 
 public class PuzzleGenerator {
     private int num_pieces;
@@ -55,9 +73,9 @@ public class PuzzleGenerator {
     }
     private Piece[] getEveryPiecesInDifficultyOrder() {
         List<Piece>[] grouped_pieces = new List<Piece>[3];
+        DifficultyIterator difficulty = new DifficultyIterator(puzzle_difficulty);
         for (int i = 0; i < 3; i++) {
-            // TODO: Refactor below line
-            grouped_pieces[i] = Piece.getPiecesInDifficulty((Difficulty)(((int)puzzle_difficulty + i) % 3));
+            grouped_pieces[i] = Piece.getPiecesInDifficulty(difficulty.rightPlusPlus());
         }
         List<Piece> ret = new List<Piece>();
         foreach (List<Piece> pieces in grouped_pieces) {
@@ -81,6 +99,12 @@ public class PuzzleGenerator {
 public class Puzzle {
     private List<PlacedPiece> pieces;
 
+    public Puzzle() {
+        pieces = new List<PlacedPiece>();
+    }
+    public Puzzle(List<PlacedPiece> ppieces) {
+        pieces = ppieces;
+    }
     public int size() { return pieces.Count; }
     public void add(PlacedPiece pp) { pieces.Add(pp); }
     public List<PlacedPiece> getNearPlacedPiecesOf(Piece p) {
@@ -120,7 +144,7 @@ public static class Rotator {
     public static Rotation reverse(Rotation original) {
         return (Rotation)(((int)original + 2) % numRotation());
     }
-    private static int numRotation() {
+    public static int numRotation() {
         return 4;
     }
     public static List<Rotation> getAll() {
@@ -138,7 +162,8 @@ public class Coordinate {
     }
     public int x, y;
     public bool adjacentTo(Coordinate other) {
-        return (Math.Abs(x - other.x) == 1) || (Math.Abs(y - other.y) == 1);
+        return ((Math.Abs(x - other.x) == 1) && (y == other.y)) || 
+            ((Math.Abs(y - other.y) == 1) && (x == other.x));
     }
 
     // From MSDN: https://msdn.microsoft.com/ko-kr/library/ms173147(v=vs.90).aspx
@@ -170,6 +195,8 @@ public class Coordinate {
         return x ^ y;
     }
 
+    public static bool operator ==(Coordinate c1, Coordinate c2) { return c1.Equals(c2); }
+    public static bool operator !=(Coordinate c1, Coordinate c2) { return !c1.Equals(c2); }
     public static Coordinate operator +(Coordinate c1, Coordinate c2) {
         return new Coordinate(c1.x + c2.x, c1.y + c2.y);
     }
@@ -240,9 +267,37 @@ public class PlacedPiece {
 }
 
 public class Piece {
-    private static List<List<Coordinate>> blockCoordinates;
-    private static int[][] pieceIndexesInDifficulty;
-    private static List<int> centerIndex;
+    /// <summary>
+    /// center가 (0,0)이라고 가정.
+    /// blockCoordinates는 나머지 블록들의 좌표만 가지고 있다.
+    /// 순서는 https://en.wikipedia.org/wiki/Pentomino 와 같고
+    /// 가장 처음 나오는거는 길어서 무시함. 즉 총 17개
+    /// </summary>
+    private static int[,,] blockCoordinates = {
+        { {-1,0 }, {0,-1 }, {0,1 }, {1,1 } },
+        { {-1,1 }, {0,1 }, {0,-1 }, {1,0 } },
+        { {-1,-1 }, {0,-1 }, {0,1 }, {0,2 } },
+        { {1,-1 }, {0,-1 }, {0,1 }, {0,2 } },
+        { {0,1 }, {1,1 }, {1,0 }, {1,-1 } },
+        { {-1,-1 }, {-1,0 }, {-1,1 }, {0,1 } },
+        { {-1,-1 }, {-1,0 }, {0,1 }, {0,2 } },
+        { {1,-1 }, {1,0 }, {0,1 }, {0,2 } },
+        { {-1,1 }, {0,1 }, {1,1 }, {0,-1 } },
+        { {-1,1 }, {-1,0 }, {1,0 }, {1,1 } },
+        { {-2,0 }, {-1,0 }, {0,1 }, {0,2 } },
+        { {-1,-1 }, {0,-1 }, {1,0 }, {1,1 } },
+        { {-1,0 }, {0,1 }, {1,0 }, {0,-1 } },
+        { {0,1 }, {-1,0 }, {0,-1 }, {0,-2 } },
+        { {0,1 }, {1,0 }, {0,-1 }, {0,-2 } },
+        { {1,1 }, {0,1 }, {0,-1 }, {-1,-1 } },
+        { {-1,1 }, {0,1 }, {0,-1 }, {1,-1 } }
+    };
+    private static int[][] pieceIndexesInDifficulty = new int[3][]
+        {
+            new int[] { 2, 3, 4, 5 },
+            new int[] { 6, 7, 10, 11, 12, 13, 14 },
+            new int[] { 0, 1, 8, 9, 15, 16 }
+        };
     private int blockIndex;
     private Rotation rot;
 
@@ -268,6 +323,30 @@ public class Piece {
         return 2;
     }
     public List<Coordinate> getBlockCoordinatesRelativeToCenter() {
-        return blockCoordinates[blockIndex];
+        List<Coordinate> ret = new List<Coordinate>();
+        for (int i = 0; i < 4; i++) {
+            Coordinate blockWORotation = new Coordinate(blockCoordinates[blockIndex, i, 0], blockCoordinates[blockIndex, i, 1]);
+            ret.Add(rotate(blockWORotation));
+        }
+        Coordinate center = new Coordinate(0, 0);
+        ret.Add(center);
+        return ret;
+    }
+    private Coordinate rotate(Coordinate original) {
+        ///<summary>
+        /// NORTH가 default direction이라고 가정함
+        ///</summary>
+        switch (rot) {
+            case Rotation.NORTH:
+                return original;
+            case Rotation.EAST:
+                return new Coordinate(original.y, -original.x);
+            case Rotation.SOUTH:
+                return new Coordinate(-original.x, -original.y);
+            case Rotation.WEST:
+                return new Coordinate(-original.y, original.x);
+            default:
+                throw new ArgumentException("Rotation of Piece is null");
+        }
     }
 }
