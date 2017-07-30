@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PieceController : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private void selectOnClicked();
+    private void moveSelected(Vector3);
+    private void unSelect();
+    private void rotateSelected();
+    private void tryToInsertSelected();
+    private void resetPositionSelected();
 }
