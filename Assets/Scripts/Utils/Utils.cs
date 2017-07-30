@@ -16,4 +16,22 @@ public static class Utils {
             list[n] = value;
         }
     }
+
+    public static Coordinate rotatePointToRotation(Coordinate original, Rotation rot) {
+        ///<summary>
+        /// NORTH가 default direction이라고 가정함
+        ///</summary>
+        switch (rot) {
+            case Rotation.NORTH:
+                return original;
+            case Rotation.EAST:
+                return new Coordinate(original.y, -original.x);
+            case Rotation.SOUTH:
+                return new Coordinate(-original.x, -original.y);
+            case Rotation.WEST:
+                return new Coordinate(-original.y, original.x);
+            default:
+                throw new ArgumentException("Rotation in argument is null");
+        }
+    }
 }

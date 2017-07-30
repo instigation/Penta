@@ -160,6 +160,10 @@ public class Coordinate {
         this.x = x;
         this.y = y;
     }
+    public Coordinate(Coordinate other) {
+        x = other.x;
+        y = other.y;
+    }
     public int x, y;
     public bool adjacentTo(Coordinate other) {
         return ((Math.Abs(x - other.x) == 1) && (y == other.y)) || 
@@ -214,6 +218,10 @@ public class PlacedPiece {
     public PlacedPiece(Piece p) {
         piece = p;
         center_coordinate = new Coordinate(0, 0);
+    }
+    public PlacedPiece(PlacedPiece other) {
+        piece = new Piece(other.piece);
+        center_coordinate = new Coordinate(other.center_coordinate);
     }
     public PlacedPiece(Piece p, Coordinate cor) {
         piece = p;
@@ -273,7 +281,7 @@ public class Piece {
     /// 순서는 https://en.wikipedia.org/wiki/Pentomino 와 같고
     /// 가장 처음 나오는거는 길어서 무시함. 즉 총 17개
     /// </summary>
-    private static int[,,] blockCoordinates = {
+    private static readonly int[,,] blockCoordinates = {
         { {-1,0 }, {0,-1 }, {0,1 }, {1,1 } },
         { {-1,1 }, {0,1 }, {0,-1 }, {1,0 } },
         { {-1,-1 }, {0,-1 }, {0,1 }, {0,2 } },
@@ -292,7 +300,7 @@ public class Piece {
         { {1,1 }, {0,1 }, {0,-1 }, {-1,-1 } },
         { {-1,1 }, {0,1 }, {0,-1 }, {1,-1 } }
     };
-    private static int[][] pieceIndexesInDifficulty = new int[3][]
+    private static readonly int[][] pieceIndexesInDifficulty = new int[3][]
         {
             new int[] { 2, 3, 4, 5 },
             new int[] { 6, 7, 10, 11, 12, 13, 14 },
@@ -304,6 +312,10 @@ public class Piece {
     public Piece(int blockIndex, Rotation rot) {
         this.blockIndex = blockIndex;
         this.rot = rot;
+    }
+    public Piece(Piece other) {
+        blockIndex = other.blockIndex;
+        rot = other.rot;
     }
     public static List<Piece> getPiecesInDifficulty(Difficulty difficulty) {
         // TODO : rearrange in some order by difficulty (Policy)
@@ -326,27 +338,11 @@ public class Piece {
         List<Coordinate> ret = new List<Coordinate>();
         for (int i = 0; i < 4; i++) {
             Coordinate blockWORotation = new Coordinate(blockCoordinates[blockIndex, i, 0], blockCoordinates[blockIndex, i, 1]);
-            ret.Add(rotate(blockWORotation));
+            ret.Add(Utils.rotatePointToRotation(blockWORotation, rot));
         }
         Coordinate center = new Coordinate(0, 0);
         ret.Add(center);
         return ret;
     }
-    private Coordinate rotate(Coordinate original) {
-        ///<summary>
-        /// NORTH가 default direction이라고 가정함
-        ///</summary>
-        switch (rot) {
-            case Rotation.NORTH:
-                return original;
-            case Rotation.EAST:
-                return new Coordinate(original.y, -original.x);
-            case Rotation.SOUTH:
-                return new Coordinate(-original.x, -original.y);
-            case Rotation.WEST:
-                return new Coordinate(-original.y, original.x);
-            default:
-                throw new ArgumentException("Rotation of Piece is null");
-        }
-    }
+
 }
