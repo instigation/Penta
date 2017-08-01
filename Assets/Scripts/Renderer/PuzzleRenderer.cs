@@ -47,9 +47,9 @@ public class PuzzleRenderer : MonoBehaviour {
         List<RenderedPiece> ret = new List<RenderedPiece>();
         for(int i = 0; i < piecesInCoordinate.Count; i++) {
             List<Coordinate> pieceInCoordinate = piecesInCoordinate[i];
-            Utils.leftMostToOrigin(pieceInCoordinate);
             if (__randomizeRotation)
                 Utils.rotateRandomly(pieceInCoordinate);
+            Utils.leftMostToOrigin(pieceInCoordinate);
             // 실제 rendering은 RenderedPiece의 생성자에서.
             RenderedPiece renderedPiece = new RenderedPiece(pieceInCoordinate, __pieceBlocks[i], __gapPerBlockSize, __candidateLeftMostBlockSpawnPoint);
             moveSpawnPointToRightEndOf(renderedPiece);
@@ -86,11 +86,11 @@ public class RenderedPuzzleSet {
 }
 
 public class RenderedPiece {
-    List<Coordinate> blocks;
-    GameObject pieceBlock;
-    float gapPerBlockSize;
-    GameObject leftMost;
-    List<GameObject> renderedBlocks;
+    private List<Coordinate> blocks;
+    private GameObject pieceBlock;
+    private float gapPerBlockSize;
+    private GameObject leftMost;
+    private List<GameObject> renderedBlocks;
 
     public RenderedPiece(List<Coordinate> pieceInCoordinate, GameObject pieceBlock, float gapPerBlockSize, GameObject leftMost) {
         blocks = pieceInCoordinate;
