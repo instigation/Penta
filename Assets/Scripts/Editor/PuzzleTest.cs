@@ -10,11 +10,6 @@ public class RotatorTest {
         Assert.That(Rotator.reverse(Rotation.SOUTH), Is.EqualTo(Rotation.NORTH));
         Assert.That(Rotator.reverse(Rotation.NORTH), Is.EqualTo(Rotation.SOUTH));
     }
-
-    [Test]
-    public void assdf() {
-
-    }
 }
 
 public class CoordinateTest {
