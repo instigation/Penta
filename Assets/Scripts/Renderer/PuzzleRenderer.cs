@@ -23,7 +23,7 @@ public class PuzzleRenderer : MonoBehaviour {
         /// stage controller가 render 함수를 invoke하게 할 예정.
         ///</summary>
         if (holdings != null)
-            holdings.destroy();
+            holdings.destroyObjects();
         PuzzleGenerator pg = new PuzzleGenerator(3, Difficulty.HARD);
         Puzzle p = pg.generatePuzzle();
         List<List<Coordinate>> ret = p.getBlocks();
@@ -78,10 +78,10 @@ public class RenderedPuzzleSet {
         this.candidates = candidates;
         this.board = board;
     }
-    public void destroy() {
+    public void destroyObjects() {
         foreach (RenderedPiece candidate in candidates)
-            candidate.destroy();
-        board.destroy();
+            candidate.destroyObjects();
+        board.destroyObjects();
     }
 }
 
@@ -99,7 +99,7 @@ public class RenderedPiece {
         this.leftMost = leftMost;
         renderedBlocks = new List<GameObject>();
 
-        renderAtAbsolutePosition();
+        renderAtOrigin(UnityUtils.getPositionOfUIElement(leftMost));
     }
     public float getRightMostXPosition() {
         float maxXPos = UnityUtils.getPositionOfUIElement(renderedBlocks[0]).x;
@@ -114,11 +114,10 @@ public class RenderedPiece {
         float widthNum = (float)Utils.getWidth(blocks);
         return (widthNum + (widthNum - 1) * gapPerBlockSize) * blockSize();
     }
-    private void renderAtAbsolutePosition() {
+    private void renderAtOrigin(Vector3 originPosition) {
         float distance = blockSize() * (1 + gapPerBlockSize);
-        Vector3 leftMostPosition = leftMost.transform.position;
         foreach(Coordinate block in blocks) {
-            Vector3 position = leftMostPosition + UnityUtils.toVector3(block) * distance;
+            Vector3 position = originPosition + UnityUtils.toVector3(block) * distance;
             GameObject renderedBlock = renderOneBlockAt(position);
             renderedBlocks.Add(renderedBlock);
         }
@@ -129,12 +128,18 @@ public class RenderedPiece {
     private GameObject renderOneBlockAt(Vector3 position) {
         return MonoBehaviourUtils.renderBlockWithPosition(pieceBlock, position);
     }
-    public void destroy() {
+    public void destroyObjects() {
         foreach (GameObject renderedBlock in renderedBlocks)
             Object.Destroy(renderedBlock);
     }
     /*
-    public void rotate();
+    public void rotate() {
+        destroyObjects();
+        Vector3 center = centerOf(renderedBlocks);
+        rotateSetForTimes(blocks, 1);
+        Utils.centerToOrigin(blocks);
+        renderAtOrigin(center);
+    }
     public void move(Vector3);
     public void resetPosition();
     public void reset();
@@ -164,7 +169,7 @@ public class RenderedPuzzle {
     }
     private void render() {
         float distance = blockSize() * (1 + gapPerBlockSize);
-        Vector3 centerPosition = centerOfBoard.transform.position;
+        Vector3 centerPosition = UnityUtils.getPositionOfUIElement(centerOfBoard);
         foreach(List<Coordinate> piece in pieces) {
             foreach(Coordinate block in piece) {
                 Vector3 position = centerPosition + distance * UnityUtils.toVector3(block);
@@ -190,7 +195,7 @@ public class RenderedPuzzle {
     private GameObject renderBlockAt(Vector3 position) {
         return MonoBehaviourUtils.renderBlockWithPosition(boardBlock, position);
     }
-    public void destroy() {
+    public void destroyObjects() {
         foreach(List<GameObject> subList in renderedBlocks)
             foreach(GameObject renderedBlock in subList)
                 Object.Destroy(renderedBlock);

@@ -41,10 +41,9 @@ public static class Utils {
 
     public static void centerToOrigin(List<List<Coordinate>> coors) {
         Coordinate center = centerOfEnvelope(coors);
-        Coordinate estimatedCenter = new Coordinate((int)center.x, (int)center.y);
         for(int i = 0; i < coors.Count; i++) {
             for(int j = 0; j < coors[i].Count; j++) {
-                coors[i][j] -= estimatedCenter;
+                coors[i][j] -= center;
             }
         }
     }
@@ -54,6 +53,11 @@ public static class Utils {
             mergedCoors.AddRange(sub);
         }
         return centerOfEnvelope(mergedCoors);
+    }
+    public static void centerToOrigin(List<Coordinate> coors) {
+        Coordinate center = centerOfEnvelope(coors);
+        for (int i = 0; i < coors.Count; i++)
+            coors[i] -= center;
     }
     private static Coordinate centerOfEnvelope(List<Coordinate> coors) {
         int minX, minY, maxX, maxY;
@@ -96,7 +100,7 @@ public static class Utils {
         int randomRotation = rng.Next(Rotator.numRotation());
         rotateSetForTimes(set, randomRotation);
     }
-    private static void rotateSetForTimes(List<Coordinate> set, int times) {
+    public static void rotateSetForTimes(List<Coordinate> set, int times) {
         Coordinate center = set[0];
         for (int i = 1; i < set.Count; i++) {
             Coordinate vectorFromCenter = set[i] - center;

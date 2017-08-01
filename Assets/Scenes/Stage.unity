@@ -327,7 +327,7 @@ MonoBehaviour:
   __centerOfBoard: {fileID: 980444479}
   __candidateLeftMostBlockSpawnPoint: {fileID: 1263188777}
   __gapBtwBlocks: 70
-  __randomizeRotation: 0
+  __randomizeRotation: 1
 --- !u!4 &562352064
 Transform:
   m_ObjectHideFlags: 0
