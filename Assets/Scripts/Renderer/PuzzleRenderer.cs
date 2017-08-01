@@ -14,7 +14,7 @@ public class PuzzleRenderer : MonoBehaviour {
     public GameObject __candidateLeftMostBlockSpawnPoint;
     public float __gapBtwBlocks;
     public bool __randomizeRotation = false;
-    private RenderedPuzzleSet holdings = null;
+    private RenderedPuzzleSet holdings;
 
     public void testing() {
         ///<summary>
@@ -22,12 +22,19 @@ public class PuzzleRenderer : MonoBehaviour {
         /// 나중에는 Renderer는 render(Puzzle) 함수만 제공하고
         /// stage controller가 render 함수를 invoke하게 할 예정.
         ///</summary>
-        if (holdings != null)
-            holdings.destroyObjects();
         PuzzleGenerator pg = new PuzzleGenerator(3, Difficulty.HARD);
         Puzzle p = pg.generatePuzzle();
         List<List<Coordinate>> ret = p.getBlocks();
         holdings = render(p);
+    }
+    public void rotateFirstOneForTesting() {
+        holdings.candidates[0].rotate();
+    }
+    public void moveFirstOneForTesting() {
+        holdings.candidates[0].moveFor(new Vector3(10, 20));
+    }
+    public void resetFirstOneForTesting() {
+        holdings.candidates[0].reset();
     }
 
     public RenderedPuzzleSet render(Puzzle p) {
@@ -89,17 +96,16 @@ public class RenderedPiece {
     private List<Coordinate> blocks;
     private GameObject pieceBlock;
     private float gapPerBlockSize;
-    private GameObject leftMost;
+    private Vector3 leftMostPosition;
     private List<GameObject> renderedBlocks;
 
     public RenderedPiece(List<Coordinate> pieceInCoordinate, GameObject pieceBlock, float gapPerBlockSize, GameObject leftMost) {
         blocks = pieceInCoordinate;
         this.pieceBlock = pieceBlock;
         this.gapPerBlockSize = gapPerBlockSize;
-        this.leftMost = leftMost;
-        renderedBlocks = new List<GameObject>();
+        leftMostPosition = UnityUtils.getPositionOfUIElement(leftMost);
 
-        renderAtOrigin(UnityUtils.getPositionOfUIElement(leftMost));
+        renderAtOrigin(leftMostPosition);
     }
     public float getRightMostXPosition() {
         float maxXPos = UnityUtils.getPositionOfUIElement(renderedBlocks[0]).x;
@@ -115,6 +121,10 @@ public class RenderedPiece {
         return (widthNum + (widthNum - 1) * gapPerBlockSize) * blockSize();
     }
     private void renderAtOrigin(Vector3 originPosition) {
+        ///<remarks>
+        /// origin means (0,0) in Coordinates
+        ///</remarks>
+        renderedBlocks = new List<GameObject>();
         float distance = blockSize() * (1 + gapPerBlockSize);
         foreach(Coordinate block in blocks) {
             Vector3 position = originPosition + UnityUtils.toVector3(block) * distance;
@@ -132,18 +142,39 @@ public class RenderedPiece {
         foreach (GameObject renderedBlock in renderedBlocks)
             Object.Destroy(renderedBlock);
     }
-    /*
     public void rotate() {
         destroyObjects();
-        Vector3 center = centerOf(renderedBlocks);
-        rotateSetForTimes(blocks, 1);
+        Vector3 center = centerOfRenderedBlocks();
+        Utils.rotateSetForTimes(blocks, 1);
         Utils.centerToOrigin(blocks);
         renderAtOrigin(center);
     }
-    public void move(Vector3);
-    public void resetPosition();
-    public void reset();
-    */
+    private Vector3 centerOfRenderedBlocks() {
+        ///<summary>
+        /// Coordinate와 실제 rendering된 position이 '동기화' 되어 있다고 가정한다.
+        /// '동기화'는 실제 position을 보고 만든 Coordinate가 가지고 있는 Coordinate
+        /// 와 같은 것을 뜻한다.
+        ///</summary>
+        Utils.centerToOrigin(blocks);
+        Vector3 defalutPosition = UnityUtils.getPositionOfUIElement(renderedBlocks[0]);
+        float x = defalutPosition.x, y = defalutPosition.y;
+        for(int i = 0; i < blocks.Count; i++) {
+            if (blocks[i].x == 0)
+                x = UnityUtils.getPositionOfUIElement(renderedBlocks[i]).x;
+            if (blocks[i].y == 0)
+                y = UnityUtils.getPositionOfUIElement(renderedBlocks[i]).y;
+        }
+        return new Vector3(x, y);
+    }
+    public void moveFor(Vector3 distance) {
+        for (int i = 0; i < renderedBlocks.Count; i++)
+            UnityUtils.moveGameObjectForDistance(renderedBlocks[i], distance);
+    }
+    public void reset() {
+        destroyObjects();
+        Utils.leftMostToOrigin(blocks);
+        renderAtOrigin(leftMostPosition);
+    }
 }
 
 public class RenderedPuzzle {
@@ -163,11 +194,11 @@ public class RenderedPuzzle {
         this.pieceBlocks = pieceBlocks;
         this.gapPerBlockSize = gapPerBlockSize;
         this.centerOfBoard = centerOfBoard;
-        renderedBlocks = new List<List<GameObject>>();
 
         render();
     }
     private void render() {
+        renderedBlocks = new List<List<GameObject>>();
         float distance = blockSize() * (1 + gapPerBlockSize);
         Vector3 centerPosition = UnityUtils.getPositionOfUIElement(centerOfBoard);
         foreach(List<Coordinate> piece in pieces) {
