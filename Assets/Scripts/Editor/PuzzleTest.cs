@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class RotatorTest {
     [Test]
@@ -8,6 +9,11 @@ public class RotatorTest {
         Assert.That(Rotator.reverse(Rotation.EAST), Is.EqualTo(Rotation.WEST));
         Assert.That(Rotator.reverse(Rotation.SOUTH), Is.EqualTo(Rotation.NORTH));
         Assert.That(Rotator.reverse(Rotation.NORTH), Is.EqualTo(Rotation.SOUTH));
+    }
+
+    [Test]
+    public void assdf() {
+
     }
 }
 

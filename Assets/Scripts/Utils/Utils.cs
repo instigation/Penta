@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System;
+using UnityEngine;
 
 public static class Utils {
-    private static Random rng = new Random();
+    private const int MIN_INT = -1000;
+    private const int MAX_INT = 1000;
+    private static System.Random rng = new System.Random();
 
     public static void Shuffle<T>(this IList<T> list)
     {
@@ -20,6 +23,7 @@ public static class Utils {
     public static Coordinate rotatePointToRotation(Coordinate original, Rotation rot) {
         ///<summary>
         /// NORTH가 default direction이라고 가정함
+        /// center가 원점이라고 가정함
         ///</summary>
         switch (rot) {
             case Rotation.NORTH:
@@ -33,5 +37,83 @@ public static class Utils {
             default:
                 throw new ArgumentException("Rotation in argument is null");
         }
+    }
+
+    public static void centerToOrigin(List<List<Coordinate>> coors) {
+        Coordinate center = centerOfEnvelope(coors);
+        Coordinate estimatedCenter = new Coordinate((int)center.x, (int)center.y);
+        for(int i = 0; i < coors.Count; i++) {
+            for(int j = 0; j < coors[i].Count; j++) {
+                coors[i][j] -= estimatedCenter;
+            }
+        }
+    }
+    private static Coordinate centerOfEnvelope(List<List<Coordinate>> coors) {
+        List<Coordinate> mergedCoors = new List<Coordinate>();
+        foreach(List<Coordinate> sub in coors) {
+            mergedCoors.AddRange(sub);
+        }
+        return centerOfEnvelope(mergedCoors);
+    }
+    private static Coordinate centerOfEnvelope(List<Coordinate> coors) {
+        int minX, minY, maxX, maxY;
+        minX = minY = MAX_INT;
+        maxX = maxY = MIN_INT;
+        foreach(Coordinate coor in coors) {
+            if (coor.x < minX)
+                minX = coor.x;
+            if (coor.x > maxX)
+                maxX = coor.x;
+            if (coor.y < minY)
+                minY = coor.y;
+            if (coor.y > maxY)
+                maxY = coor.y;
+        }
+        return new Coordinate((minX + maxX)/2, (minY + maxY)/2);
+    }
+
+    public static void leftMostToOrigin(List<Coordinate> coors) {
+        Coordinate leftMostPoint = leftMostOfEnvelope(coors);
+        for(int i = 0; i < coors.Count; i++)
+            coors[i] -= leftMostPoint;
+    }
+    private static Coordinate leftMostOfEnvelope(List<Coordinate> set) {
+        int minX, minY, maxY;
+        minX = minY = MAX_INT;
+        maxY = MIN_INT;
+        foreach (Coordinate coor in set) {
+            if (coor.x < minX)
+                minX = coor.x;
+            if (coor.y < minY)
+                minY = coor.y;
+            if (coor.y > maxY)
+                maxY = coor.y;
+        }
+        return new Coordinate(minX, (minY + maxY) / 2);
+    }
+
+    public static void rotateRandomly(List<Coordinate> set) {
+        int randomRotation = rng.Next(Rotator.numRotation());
+        rotateSetForTimes(set, randomRotation);
+    }
+    private static void rotateSetForTimes(List<Coordinate> set, int times) {
+        Coordinate center = set[0];
+        for (int i = 1; i < set.Count; i++) {
+            Coordinate vectorFromCenter = set[i] - center;
+            Coordinate result = rotatePointToRotation(vectorFromCenter, (Rotation) times);
+            set[i] = result + center;
+        }
+    }
+
+    public static int getWidth(List<Coordinate> set) {
+        int count = 0;
+        List<int> occuredXCoordinates = new List<int>();
+        foreach(Coordinate point in set) {
+            if (!occuredXCoordinates.Contains(point.x)) {
+                occuredXCoordinates.Add(point.x);
+                count++;
+            }
+        }
+        return count;
     }
 }

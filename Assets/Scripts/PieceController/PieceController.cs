@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
 public class PieceController : MonoBehaviour {
     private void selectOnClicked();
     private void moveSelected(Vector3);
@@ -10,3 +11,4 @@ public class PieceController : MonoBehaviour {
     private void tryToInsertSelected();
     private void resetPositionSelected();
 }
+*/

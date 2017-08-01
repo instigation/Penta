@@ -106,6 +106,13 @@ public class Puzzle {
         pieces = ppieces;
     }
     public int size() { return pieces.Count; }
+    public List<List<Coordinate>> getBlocks() {
+        List<List<Coordinate>> ret = new List<List<Coordinate>>();
+        foreach(PlacedPiece piece in pieces) {
+            ret.Add(piece.getBlocks());
+        }
+        return ret;
+    }
     public void add(PlacedPiece pp) { pieces.Add(pp); }
     public List<PlacedPiece> getNearPlacedPiecesOf(Piece p) {
         List<PlacedPiece> ret = new List<PlacedPiece>();
@@ -156,6 +163,8 @@ public static class Rotator {
 }
 
 public class Coordinate {
+    public int x, y;
+
     public Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
@@ -164,7 +173,7 @@ public class Coordinate {
         x = other.x;
         y = other.y;
     }
-    public int x, y;
+
     public bool adjacentTo(Coordinate other) {
         return ((Math.Abs(x - other.x) == 1) && (y == other.y)) || 
             ((Math.Abs(y - other.y) == 1) && (x == other.x));
@@ -203,6 +212,9 @@ public class Coordinate {
     public static bool operator !=(Coordinate c1, Coordinate c2) { return !c1.Equals(c2); }
     public static Coordinate operator +(Coordinate c1, Coordinate c2) {
         return new Coordinate(c1.x + c2.x, c1.y + c2.y);
+    }
+    public static Coordinate operator -(Coordinate c1, Coordinate c2) {
+        return new Coordinate(c1.x - c2.x, c1.y - c2.y);
     }
 
     public override string ToString() {
