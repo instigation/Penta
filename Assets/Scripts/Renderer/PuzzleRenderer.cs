@@ -228,28 +228,36 @@ public class RenderedPuzzle {
             foreach(GameObject renderedBlock in subList)
                 UnityEngine.Object.Destroy(renderedBlock);
     }
-    public void tryToInsert(List<Vector3> blockPositions) {
+    // TODO: 끔찍함. 분리해야함
+    private Vector3 delta;
+    public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
         if (fits(blockPositions)) {
             occupyBlocksAt(blockPositions);
+            return delta;
         }
+        return new Vector3(0, 0);
     }
     private bool fits(List<Vector3> blocks) {
         foreach(Vector3 block in blocks) {
-            if (boardBlockIndexNearEnoughToFit(block) == null)
+            if ((System.Object)boardBlockIndexNearEnoughToFit(block, true) == null)
                 return false;
         }
         return true;
     }
-    private Coordinate boardBlockIndexNearEnoughToFit(Vector3 blockPosition) {
+    private Coordinate boardBlockIndexNearEnoughToFit(Vector3 blockPosition, bool checkOccupied = false) {
         ///<summary>
         /// returns null if there's no such block
         ///</summary>
         for (int i = 0; i < renderedBlocks.Count; i++) {
             for (int j = 0; j < renderedBlocks[i].Count; j++) {
+                if (checkOccupied && isOccupied[i][j])
+                    continue;
                 Vector3 position = UnityUtils.getPositionOfUIElement(renderedBlocks[i][j]);
                 float range = (blockSize() / 2) * rangePerHalfBlockSize;
-                if (Vector3.Distance(blockPosition, position) < range)
+                if (Vector3.Distance(blockPosition, position) < range) {
+                    delta = position - blockPosition;
                     return new Coordinate(i, j);
+                }
             }
         }
         return null;
@@ -269,7 +277,7 @@ public class RenderedPuzzle {
         List<Coordinate> ret = new List<Coordinate>();
         foreach(Vector3 block in blocks) {
             Coordinate index = boardBlockIndexNearEnoughToFit(block);
-            if(index != null)
+            if((System.Object)index != null)
                 ret.Add(index);
         }
         return ret;

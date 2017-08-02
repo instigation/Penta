@@ -4,19 +4,21 @@ using UnityEngine;
 
 
 public class PieceController : MonoBehaviour{
+    // TODO : selected ?= NONE check를 없애자
     private List<RenderedPiece> candidates;
     private RenderedPuzzle board;
     private int selected = NONE;
     private const int NONE = -1;
-
-    void Update() {
-
+    
+    public void setPuzzleSet(RenderedPuzzleSet puzzleSet) {
+        candidates = puzzleSet.candidates;
+        board = puzzleSet.board;
     }
     public void rotateSelected() {
         if (selected != NONE)
             candidates[selected].rotate();
     }
-    private void selectOnPosition(Vector3 position) {
+    public void selectOnPosition(Vector3 position) {
         for (int i = 0; i < candidates.Count; i++) {
             RenderedPiece candidate = candidates[i];
             if (positionIsInCandidate(position, candidate)) {
@@ -39,22 +41,30 @@ public class PieceController : MonoBehaviour{
         }
         return false;
     }
-    private void moveSelectedFor(Vector3 distance) {
+    public void moveSelectedFor(Vector3 distance) {
         if (selected != NONE)
             candidates[selected].moveFor(distance);
     }
     private void unSelect() {
         selected = NONE;
     }
-    private void tryToInsertSelected() {
+    public void tryToInsertSelected() {
         if(selected != NONE) {
             RenderedPiece selectedPiece = candidates[selected];
-            board.tryToInsert(selectedPiece.getBlockPositions());
+            Vector3 delta = board.tryToInsertAndReturnDelta(selectedPiece.getBlockPositions());
+            // 여기서 candidate도 옮겨 주고 싶은데 어떻게 할까
+            moveSelectedFor(delta);
         }
     }
     private void resetSelected() {
         if (selected != NONE)
             candidates[selected].reset();
+    }
+    public void tryToExtractSelected() {
+        if(selected != NONE) {
+            RenderedPiece selectedPiece = candidates[selected];
+            board.extract(selectedPiece.getBlockPositions());
+        }
     }
 }
 
