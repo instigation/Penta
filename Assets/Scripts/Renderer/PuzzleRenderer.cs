@@ -15,27 +15,6 @@ public class PuzzleRenderer : MonoBehaviour {
     public GameObject __candidateLeftMostBlockSpawnPoint;
     public float __gapBtwBlocks;
     public bool __randomizeRotation = false;
-    private RenderedPuzzleSet holdings;
-
-    public void testing() {
-        ///<summary>
-        /// Only for testing purpose.
-        /// 나중에는 Renderer는 render(Puzzle) 함수만 제공하고
-        /// stage controller가 render 함수를 invoke하게 할 예정.
-        ///</summary>
-        PuzzleGenerator pg = new PuzzleGenerator(3, Difficulty.HARD);
-        Puzzle p = pg.generatePuzzle();
-        holdings = render(p);
-    }
-    public void rotateFirstOneForTesting() {
-        holdings.candidates[0].rotate();
-    }
-    public void moveFirstOneForTesting() {
-        holdings.candidates[0].moveFor(new Vector3(10, 20));
-    }
-    public void resetFirstOneForTesting() {
-        holdings.candidates[0].reset();
-    }
 
     public RenderedPuzzleSet render(Puzzle p) {
         ///<summary>
@@ -107,6 +86,14 @@ public class RenderedPiece {
 
         renderAtOrigin(leftMostPosition);
     }
+    public List<Vector3> getBlockPositions() {
+        List<Vector3> ret = new List<Vector3>();
+        foreach(GameObject renderedBlock in renderedBlocks) {
+            Vector3 newPosition = UnityUtils.getPositionOfUIElement(renderedBlock);
+            ret.Add(newPosition);
+        }
+        return ret;
+    }
     public float getRightMostXPosition() {
         float maxXPos = UnityUtils.getPositionOfUIElement(renderedBlocks[0]).x;
         foreach(GameObject block in renderedBlocks) {
@@ -132,7 +119,7 @@ public class RenderedPiece {
             renderedBlocks.Add(renderedBlock);
         }
     }
-    private float blockSize() {
+    public float blockSize() {
         return UnityUtils.getWidthOfUIElement(pieceBlock);
     }
     private GameObject renderOneBlockAt(Vector3 position) {
@@ -241,23 +228,22 @@ public class RenderedPuzzle {
             foreach(GameObject renderedBlock in subList)
                 UnityEngine.Object.Destroy(renderedBlock);
     }
-    public void tryToInsert(List<GameObject> blocks) {
-        if (fits(blocks)) {
-            occupyBlocksAt(blocks);
+    public void tryToInsert(List<Vector3> blockPositions) {
+        if (fits(blockPositions)) {
+            occupyBlocksAt(blockPositions);
         }
     }
-    private bool fits(List<GameObject> blocks) {
-        foreach(GameObject block in blocks) {
+    private bool fits(List<Vector3> blocks) {
+        foreach(Vector3 block in blocks) {
             if (boardBlockIndexNearEnoughToFit(block) == null)
                 return false;
         }
         return true;
     }
-    private Coordinate boardBlockIndexNearEnoughToFit(GameObject block) {
+    private Coordinate boardBlockIndexNearEnoughToFit(Vector3 blockPosition) {
         ///<summary>
         /// returns null if there's no such block
         ///</summary>
-        Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
         for (int i = 0; i < renderedBlocks.Count; i++) {
             for (int j = 0; j < renderedBlocks[i].Count; j++) {
                 Vector3 position = UnityUtils.getPositionOfUIElement(renderedBlocks[i][j]);
@@ -268,20 +254,20 @@ public class RenderedPuzzle {
         }
         return null;
     }
-    private void occupyBlocksAt(List<GameObject> blocks) {
+    private void occupyBlocksAt(List<Vector3> blocks) {
         // Tuple이 없어서 대신 Coordinate를 사용함
         List<Coordinate> indexes = fittedIndexes(blocks);
         foreach (Coordinate index in indexes)
             isOccupied[index.x][index.y] = true;
     }
-    public void extract(List<GameObject> blocks) {
+    public void extract(List<Vector3> blocks) {
         List<Coordinate> indexes = fittedIndexes(blocks);
         foreach (Coordinate index in indexes)
             isOccupied[index.x][index.y] = false;
     }
-    private List<Coordinate> fittedIndexes(List<GameObject> blocks) {
+    private List<Coordinate> fittedIndexes(List<Vector3> blocks) {
         List<Coordinate> ret = new List<Coordinate>();
-        foreach(GameObject block in blocks) {
+        foreach(Vector3 block in blocks) {
             Coordinate index = boardBlockIndexNearEnoughToFit(block);
             if(index != null)
                 ret.Add(index);
