@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PuzzleRenderer : MonoBehaviour {
@@ -24,7 +25,6 @@ public class PuzzleRenderer : MonoBehaviour {
         ///</summary>
         PuzzleGenerator pg = new PuzzleGenerator(3, Difficulty.HARD);
         Puzzle p = pg.generatePuzzle();
-        List<List<Coordinate>> ret = p.getBlocks();
         holdings = render(p);
     }
     public void rotateFirstOneForTesting() {
@@ -140,7 +140,7 @@ public class RenderedPiece {
     }
     public void destroyObjects() {
         foreach (GameObject renderedBlock in renderedBlocks)
-            Object.Destroy(renderedBlock);
+            UnityEngine.Object.Destroy(renderedBlock);
     }
     public void rotate() {
         destroyObjects();
@@ -185,6 +185,8 @@ public class RenderedPuzzle {
     private float gapPerBlockSize;
     private GameObject centerOfBoard;
     private List<List<GameObject>> renderedBlocks;
+    private List<List<bool>> isOccupied;
+    private float rangePerHalfBlockSize = 0.9f;
 
     public RenderedPuzzle(List<List<Coordinate>> piecesInCoordinate, GameObject boardBlock, GameObject boardBlockBackground, 
         GameObject[] pieceBlocks, float gapPerBlockSize, GameObject centerOfBoard) {
@@ -194,6 +196,14 @@ public class RenderedPuzzle {
         this.pieceBlocks = pieceBlocks;
         this.gapPerBlockSize = gapPerBlockSize;
         this.centerOfBoard = centerOfBoard;
+        isOccupied = new List<List<bool>>();
+        for(int i = 0; i < pieces.Count; i++) {
+            List<bool> subList = new List<bool>();
+            for(int j = 0; j < pieces[i].Count; j++) {
+                subList.Add(false);
+            }
+            isOccupied.Add(subList);
+        }
 
         render();
     }
@@ -229,12 +239,64 @@ public class RenderedPuzzle {
     public void destroyObjects() {
         foreach(List<GameObject> subList in renderedBlocks)
             foreach(GameObject renderedBlock in subList)
-                Object.Destroy(renderedBlock);
+                UnityEngine.Object.Destroy(renderedBlock);
     }
-    /*
-    public void tryToInsert(RenderedPiece);
-    public void extract(RenderedPiece);
-    public bool isSolved();
-    public void showAns();
-    */
+    public void tryToInsert(List<GameObject> blocks) {
+        if (fits(blocks)) {
+            occupyBlocksAt(blocks);
+        }
+    }
+    private bool fits(List<GameObject> blocks) {
+        foreach(GameObject block in blocks) {
+            if (boardBlockIndexNearEnoughToFit(block) == null)
+                return false;
+        }
+        return true;
+    }
+    private Coordinate boardBlockIndexNearEnoughToFit(GameObject block) {
+        ///<summary>
+        /// returns null if there's no such block
+        ///</summary>
+        Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
+        for (int i = 0; i < renderedBlocks.Count; i++) {
+            for (int j = 0; j < renderedBlocks[i].Count; j++) {
+                Vector3 position = UnityUtils.getPositionOfUIElement(renderedBlocks[i][j]);
+                float range = (blockSize() / 2) * rangePerHalfBlockSize;
+                if (Vector3.Distance(blockPosition, position) < range)
+                    return new Coordinate(i, j);
+            }
+        }
+        return null;
+    }
+    private void occupyBlocksAt(List<GameObject> blocks) {
+        // Tuple이 없어서 대신 Coordinate를 사용함
+        List<Coordinate> indexes = fittedIndexes(blocks);
+        foreach (Coordinate index in indexes)
+            isOccupied[index.x][index.y] = true;
+    }
+    public void extract(List<GameObject> blocks) {
+        List<Coordinate> indexes = fittedIndexes(blocks);
+        foreach (Coordinate index in indexes)
+            isOccupied[index.x][index.y] = false;
+    }
+    private List<Coordinate> fittedIndexes(List<GameObject> blocks) {
+        List<Coordinate> ret = new List<Coordinate>();
+        foreach(GameObject block in blocks) {
+            Coordinate index = boardBlockIndexNearEnoughToFit(block);
+            if(index != null)
+                ret.Add(index);
+        }
+        return ret;
+    }
+    public bool isSolved() {
+        foreach (List<bool> subList in isOccupied)
+            foreach (bool isBlockOccupied in subList)
+                if (!isBlockOccupied)
+                    return false;
+        return true;
+    }
+    public void showAns(){
+        // 정답을 rendering하게 되면 정답이 조각보다 위에 위치해서
+        // 조각을 끌어다 놔도 정답 밑에 깔리게 되는 이슈를 유의하자.
+    }
 }
