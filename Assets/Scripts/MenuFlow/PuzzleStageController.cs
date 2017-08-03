@@ -98,14 +98,14 @@ public class MouseInputWrapper : GeneralInput {
     }
     private void stateTransition() {
         if(current == state.IDLE) {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.R))
                 current = state.BEGAN;
         }
         else if(current == state.BEGAN) {
             current = state.MOVED;
         }
         else if(current == state.MOVED) {
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.R))
                 current = state.ENDED;
         }
         else if(current == state.ENDED) {
@@ -113,7 +113,7 @@ public class MouseInputWrapper : GeneralInput {
         }
     }
     public bool noTouching() {
-        return current == state.IDLE;
+        return (current == state.IDLE);
     }
     public bool touchBegan() {
         return current == state.BEGAN;
