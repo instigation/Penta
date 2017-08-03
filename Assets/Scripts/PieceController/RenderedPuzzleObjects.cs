@@ -127,20 +127,19 @@ public class RenderedPiece {
 }
 
 public class RenderedPuzzle {
-    //TODO : renderedBlocks -> board
-    private List<List<GameObject>> renderedBlocks;
+    private List<List<GameObject>> board;
     private List<List<bool>> isOccupied;
     private const float rangePerHalfBlockSize = 0.9f;
 
     public RenderedPuzzle(List<List<GameObject>> renderedBlocks) {
-        this.renderedBlocks = renderedBlocks;
+        board = renderedBlocks;
         initMaskAsLengthOfBlocks(ref isOccupied);
     }
     private void initMaskAsLengthOfBlocks(ref List<List<bool>> mask) {
         mask = new List<List<bool>>();
-        for (int i = 0; i < renderedBlocks.Count; i++) {
+        for (int i = 0; i < board.Count; i++) {
             List<bool> subList = new List<bool>();
-            for (int j = 0; j < renderedBlocks[i].Count; j++) {
+            for (int j = 0; j < board[i].Count; j++) {
                 subList.Add(false);
             }
             mask.Add(subList);
@@ -216,7 +215,7 @@ public class RenderedPuzzle {
     }
 
     public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
-        Comparer comp = new Comparer(renderedBlocks, isOccupied, blockPositions);
+        Comparer comp = new Comparer(board, isOccupied, blockPositions);
         if (comp.fits()) {
             occupyBlocksAt(comp.getFittedIndexes());
         }
@@ -227,7 +226,7 @@ public class RenderedPuzzle {
             isOccupied[index.x][index.y] = true;
     }
     public void tryToExtract(List<Vector3> blockPositions) {
-        Comparer comp = new Comparer(renderedBlocks, isOccupied, blockPositions);
+        Comparer comp = new Comparer(board, isOccupied, blockPositions);
         if(comp.isCovered())
             releaseBlocksAt(comp.getCoveredIndexes());
     }
@@ -235,18 +234,18 @@ public class RenderedPuzzle {
         foreach (Coordinate index in indexes)
             isOccupied[index.x][index.y] = false;
     }
-    private void debugOccupied() {
-        Debug.Log("start====================");
-        foreach (List<bool> a in isOccupied)
-            foreach (bool b in a)
-                Debug.Log(b);
-        Debug.Log("end====================");
-    }
     public bool isSolved() {
         foreach (List<bool> subList in isOccupied)
             foreach (bool isBlockOccupied in subList)
                 if (!isBlockOccupied)
                     return false;
         return true;
+    }
+    private void debugOccupied() {
+        Debug.Log("start====================");
+        foreach (List<bool> a in isOccupied)
+            foreach (bool b in a)
+                Debug.Log(b);
+        Debug.Log("end====================");
     }
 }
