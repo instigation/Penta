@@ -127,80 +127,120 @@ public class RenderedPiece {
 }
 
 public class RenderedPuzzle {
+    //TODO : renderedBlocks -> board
     private List<List<GameObject>> renderedBlocks;
     private List<List<bool>> isOccupied;
     private const float rangePerHalfBlockSize = 0.9f;
 
     public RenderedPuzzle(List<List<GameObject>> renderedBlocks) {
         this.renderedBlocks = renderedBlocks;
-        initIsOccupiedAsLengthOfBlocks();
+        initMaskAsLengthOfBlocks(ref isOccupied);
     }
-    private void initIsOccupiedAsLengthOfBlocks() {
-        isOccupied = new List<List<bool>>();
+    private void initMaskAsLengthOfBlocks(ref List<List<bool>> mask) {
+        mask = new List<List<bool>>();
         for (int i = 0; i < renderedBlocks.Count; i++) {
             List<bool> subList = new List<bool>();
             for (int j = 0; j < renderedBlocks[i].Count; j++) {
                 subList.Add(false);
             }
-            isOccupied.Add(subList);
+            mask.Add(subList);
         }
     }
-    // TODO: 끔찍함. 분리해야함
-    private Vector3 delta;
-    public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
-        if (fits(blockPositions)) {
-            occupyBlocksAt(blockPositions);
-            return delta;
+
+    private class Comparer {
+        // TODO: readonly로 바꾸기
+        private List<List<GameObject>> board;
+        private List<List<bool>> covered;
+        private List<Vector3> target;
+        private bool isTargetFits;
+        private bool isTargetCovered;
+        // Tuple이 없어서 대신 Coordinate를 사용함
+        private List<Coordinate> fittedIndexes;
+        private List<Coordinate> coveredIndexes;
+        private Vector3 delta;
+        
+        public Comparer(List<List<GameObject>> board, List<List<bool>> covered, List<Vector3> target) {
+            this.board = board;
+            this.covered = covered;
+            this.target = target;
+            fittedIndexes = new List<Coordinate>();
+            coveredIndexes = new List<Coordinate>();
+            compare();
         }
-        return new Vector3(0, 0);
-    }
-    private bool fits(List<Vector3> blocks) {
-        foreach (Vector3 block in blocks) {
-            if ((System.Object)boardBlockIndexNearEnoughToFit(block, true) == null)
-                return false;
-        }
-        return true;
-    }
-    private Coordinate boardBlockIndexNearEnoughToFit(Vector3 blockPosition, bool checkOccupied = false) {
-        ///<summary>
-        /// returns null if there's no such block
-        ///</summary>
-        for (int i = 0; i < renderedBlocks.Count; i++) {
-            for (int j = 0; j < renderedBlocks[i].Count; j++) {
-                if (checkOccupied && isOccupied[i][j])
-                    continue;
-                Vector3 position = UnityUtils.getPositionOfUIElement(renderedBlocks[i][j]);
-                float range = (blockSize() / 2) * rangePerHalfBlockSize;
-                if (Vector3.Distance(blockPosition, position) < range) {
-                    delta = position - blockPosition;
-                    return new Coordinate(i, j);
-                }
+        private void compare() {
+            isTargetFits = true;
+            isTargetCovered = true;
+            foreach(Vector3 block in target) {
+                compareOne(block);
             }
         }
-        return null;
+        private void compareOne(Vector3 blockPosition) {
+            for (int i = 0; i < board.Count; i++) {
+                for (int j = 0; j < board[i].Count; j++) {
+                    Vector3 position = UnityUtils.getPositionOfUIElement(board[i][j]);
+                    float blockSize = UnityUtils.getWidthOfUIElement(board[i][j]);
+                    float range = (blockSize / 2) * rangePerHalfBlockSize;
+                    if (Vector3.Distance(blockPosition, position) < range) {
+                        if (covered[i][j]) {
+                            coveredIndexes.Add(new Coordinate(i, j));
+                            isTargetFits = false;
+                            return;
+                        }
+                        else {
+                            delta = position - blockPosition;
+                            fittedIndexes.Add(new Coordinate(i, j));
+                            isTargetCovered = false;
+                            return;
+                        }
+                    }
+                }
+            }
+            isTargetFits = false;
+            isTargetCovered = false;
+        }
+        public bool fits() { return isTargetFits; }
+        public bool isCovered() { return isTargetCovered; }
+        public Vector3 getDelta() { return isTargetFits? delta : new Vector3(0, 0); }
+        public List<Coordinate> getFittedIndexes() {
+            if(fits())
+                return fittedIndexes;
+            else
+                return new List<Coordinate>();
+        }
+        public List<Coordinate> getCoveredIndexes() {
+            if (isCovered())
+                return coveredIndexes;
+            else
+                return new List<Coordinate>();
+        }
     }
-    private float blockSize() {
-        return UnityUtils.getWidthOfUIElement(renderedBlocks[0][0]);
+
+    public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
+        Comparer comp = new Comparer(renderedBlocks, isOccupied, blockPositions);
+        if (comp.fits()) {
+            occupyBlocksAt(comp.getFittedIndexes());
+        }
+        return comp.getDelta();
     }
-    private void occupyBlocksAt(List<Vector3> blocks) {
-        // Tuple이 없어서 대신 Coordinate를 사용함
-        List<Coordinate> indexes = fittedIndexes(blocks);
+    private void occupyBlocksAt(List<Coordinate> indexes) {
         foreach (Coordinate index in indexes)
             isOccupied[index.x][index.y] = true;
     }
-    public void extract(List<Vector3> blocks) {
-        List<Coordinate> indexes = fittedIndexes(blocks);
+    public void tryToExtract(List<Vector3> blockPositions) {
+        Comparer comp = new Comparer(renderedBlocks, isOccupied, blockPositions);
+        if(comp.isCovered())
+            releaseBlocksAt(comp.getCoveredIndexes());
+    }
+    private void releaseBlocksAt(List<Coordinate> indexes) {
         foreach (Coordinate index in indexes)
             isOccupied[index.x][index.y] = false;
     }
-    private List<Coordinate> fittedIndexes(List<Vector3> blocks) {
-        List<Coordinate> ret = new List<Coordinate>();
-        foreach (Vector3 block in blocks) {
-            Coordinate index = boardBlockIndexNearEnoughToFit(block);
-            if ((System.Object)index != null)
-                ret.Add(index);
-        }
-        return ret;
+    private void debugOccupied() {
+        Debug.Log("start====================");
+        foreach (List<bool> a in isOccupied)
+            foreach (bool b in a)
+                Debug.Log(b);
+        Debug.Log("end====================");
     }
     public bool isSolved() {
         foreach (List<bool> subList in isOccupied)

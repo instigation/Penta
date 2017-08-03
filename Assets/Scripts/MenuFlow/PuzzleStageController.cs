@@ -30,7 +30,6 @@ public class PuzzleStageController : MonoBehaviour {
                 __controller.tryToExtractSelected();
             }
             else if (input.touchMoved()) {
-                Debug.Log("touch moved!");
                 __controller.moveSelectedFor(input.deltaPosition());
             }
             else if (input.touchEnded()) {

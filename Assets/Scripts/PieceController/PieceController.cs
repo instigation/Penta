@@ -62,7 +62,7 @@ public class PieceController : MonoBehaviour{
     public void tryToExtractSelected() {
         if(selected != NONE) {
             RenderedPiece selectedPiece = candidates[selected];
-            board.extract(selectedPiece.getBlockPositions());
+            board.tryToExtract(selectedPiece.getBlockPositions());
         }
     }
 }
