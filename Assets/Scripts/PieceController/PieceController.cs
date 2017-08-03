@@ -52,7 +52,6 @@ public class PieceController : MonoBehaviour{
         if(selected != NONE) {
             RenderedPiece selectedPiece = candidates[selected];
             Vector3 delta = board.tryToInsertAndReturnDelta(selectedPiece.getBlockPositions());
-            // 여기서 candidate도 옮겨 주고 싶은데 어떻게 할까
             moveSelectedFor(delta);
         }
     }

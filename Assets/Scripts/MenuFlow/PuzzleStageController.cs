@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PuzzleStageController : MonoBehaviour {
-    public PuzzleRenderer __renderer;
+    public PuzzleSetRenderer __renderer;
     public PieceController __controller;
     private GeneralInput input;
     public GameObject __canvas;

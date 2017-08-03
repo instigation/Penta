@@ -6,11 +6,11 @@ public static class UnityUtils{
         return new Vector3(coor.x, coor.y);
     }
 
-    public static void moveGameObjectForDistance(GameObject target, Vector2 distance) {
+    public static void moveUIElementForDistance(GameObject target, Vector2 distance) {
         target.GetComponent<RectTransform>().anchoredPosition += distance;
     }
 
-    public static void moveGameObjectToPosition(GameObject target, Vector3 position) {
+    public static void moveUIElementToPosition(GameObject target, Vector3 position) {
         target.GetComponent<RectTransform>().anchoredPosition = position;
     }
 
@@ -20,5 +20,9 @@ public static class UnityUtils{
 
     public static Vector3 getPositionOfUIElement(GameObject target) {
         return target.GetComponent<RectTransform>().anchoredPosition;
+    }
+
+    public static Vector3 rotateClockwiseAQuater(Vector3 vector) {
+        return new Vector3(vector.y, -vector.x);
     }
 }
