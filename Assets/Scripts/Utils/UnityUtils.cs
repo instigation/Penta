@@ -18,6 +18,12 @@ public static class UnityUtils{
         return target.GetComponent<RectTransform>().rect.width;
     }
 
+    public static List<Vector3> getPositionsOfUIElements(List<GameObject> targets) {
+        List<Vector3> ret = new List<Vector3>();
+        foreach (GameObject target in targets)
+            ret.Add(getPositionOfUIElement(target));
+        return ret;
+    }
     public static Vector3 getPositionOfUIElement(GameObject target) {
         return target.GetComponent<RectTransform>().anchoredPosition;
     }

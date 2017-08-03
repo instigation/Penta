@@ -12,78 +12,124 @@ public class RenderedPuzzleSet {
     }
 }
 
-public class RenderedPiece {
-    private List<GameObject> renderedBlocks;
-    private List<Coordinate> blocks;
+public class StructuredPiece {
+    private List<GameObject> blocks;
+    private List<Coordinate> coors;
 
-    public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) {
-        renderedBlocks = rBlocks;
+    public StructuredPiece(List<GameObject> blocks, List<Coordinate> coors) {
         this.blocks = blocks;
+        this.coors = coors;
+    }
+    public Vector3 centerPosition() {
+        Utils.centerToOrigin(coors);
+        return getOriginPosition();
+    }
+    public Vector3 leftMostPosition() {
+        Utils.leftMostToOrigin(coors);
+        return getOriginPosition();
+    }
+    private Vector3 getOriginPosition() {
+        List<Vector3> blockPositions = UnityUtils.getPositionsOfUIElements(blocks);
+        Vector3 defalutPosition = UnityUtils.getPositionOfUIElement(blocks[0]);
+        float x = defalutPosition.x, y = defalutPosition.y;
+        for (int i = 0; i < coors.Count; i++) {
+            if (coors[i].x == 0)
+                x = UnityUtils.getPositionOfUIElement(blocks[i]).x;
+            if (coors[i].y == 0)
+                y = UnityUtils.getPositionOfUIElement(blocks[i]).y;
+        }
+        return new Vector3(x, y);
+    }
+    public void rotateClockWiseAQuarterWithOriginPosition(Vector3 originPosition) {
+        Utils.rotateSetForTimes(coors, 1);
+        rotateGameObjectsWithOriginPosition(originPosition);
+    }
+    private void rotateGameObjectsWithOriginPosition(Vector3 originPosition) {
+        foreach (GameObject block in blocks) {
+            Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
+            Vector3 distance = blockPosition - originPosition;
+            Vector3 newPosition = originPosition + UnityUtils.rotateClockwiseAQuater(distance);
+            UnityUtils.moveUIElementToPosition(block, newPosition);
+        }
     }
     public List<Vector3> getBlockPositions() {
         List<Vector3> ret = new List<Vector3>();
-        foreach (GameObject renderedBlock in renderedBlocks) {
-            Vector3 newPosition = UnityUtils.getPositionOfUIElement(renderedBlock);
+        foreach (GameObject block in blocks) {
+            Vector3 newPosition = UnityUtils.getPositionOfUIElement(block);
             ret.Add(newPosition);
         }
         return ret;
     }
     public float getRightMostXPosition() {
-        float maxXPos = UnityUtils.getPositionOfUIElement(renderedBlocks[0]).x;
-        foreach (GameObject block in renderedBlocks) {
+        float maxXPos = UnityUtils.getPositionOfUIElement(blocks[0]).x;
+        foreach (GameObject block in blocks) {
             float x = UnityUtils.getPositionOfUIElement(block).x;
             if (maxXPos < x)
                 maxXPos = x;
         }
         return maxXPos;
     }
-    public void rotate() {
-        Vector3 center = centerOfRenderedBlocks();
-        Utils.rotateSetForTimes(blocks, 1);
-        Utils.centerToOrigin(blocks);
-        rotateWithOrigin(center);
-    }
-    private void rotateWithOrigin(Vector3 center) {
-        foreach (GameObject block in renderedBlocks) {
-            Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
-            Vector3 distance = blockPosition - center;
-            Vector3 newPosition = center + UnityUtils.rotateClockwiseAQuater(distance);
-            UnityUtils.moveUIElementToPosition(block, newPosition);
-        }
-    }
-    private Vector3 centerOfRenderedBlocks() {
-        ///<summary>
-        /// Coordinate와 실제 rendering된 position이 '동기화' 되어 있다고 가정한다.
-        /// '동기화'는 실제 position을 보고 만든 Coordinate가 가지고 있는 Coordinate
-        /// 와 같은 것을 뜻한다.
-        ///</summary>
-        Utils.centerToOrigin(blocks);
-        Vector3 defalutPosition = UnityUtils.getPositionOfUIElement(renderedBlocks[0]);
-        float x = defalutPosition.x, y = defalutPosition.y;
-        for (int i = 0; i < blocks.Count; i++) {
-            if (blocks[i].x == 0)
-                x = UnityUtils.getPositionOfUIElement(renderedBlocks[i]).x;
-            if (blocks[i].y == 0)
-                y = UnityUtils.getPositionOfUIElement(renderedBlocks[i]).y;
-        }
-        return new Vector3(x, y);
+    public float getBlockSize() {
+        return UnityUtils.getWidthOfUIElement(blocks[0]);
     }
     public void moveFor(Vector3 distance) {
-        for (int i = 0; i < renderedBlocks.Count; i++)
-            UnityUtils.moveUIElementForDistance(renderedBlocks[i], distance);
+        foreach (GameObject block in blocks)
+            UnityUtils.moveUIElementForDistance(block, distance);
+    }
+}
+
+public abstract class OrientedPiece {
+    protected Vector3 origin;
+    protected StructuredPiece piece;
+    public OrientedPiece(StructuredPiece piece) {
+        this.piece = piece;
+    }
+    public void rotateClockWiseAQuarter() {
+        piece.rotateClockWiseAQuarterWithOriginPosition(origin);
+    }
+}
+public class CenterOrientedPiece : OrientedPiece {
+    public CenterOrientedPiece(StructuredPiece piece) : base(piece) {
+        origin = piece.centerPosition();
+    }
+}
+public class LeftMostOrientedPiece : OrientedPiece {
+    public LeftMostOrientedPiece(StructuredPiece piece) : base(piece) {
+        origin = piece.leftMostPosition();
+    }
+}
+
+public class RenderedPiece {
+    private StructuredPiece structuredBlock;
+
+    public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) {
+        structuredBlock = new StructuredPiece(rBlocks, blocks);
+    }
+    public List<Vector3> getBlockPositions() {
+        return structuredBlock.getBlockPositions();
+    }
+    public float getRightMostXPosition() {
+        return structuredBlock.getRightMostXPosition();
+    }
+    public void rotate() {
+        CenterOrientedPiece coPiece = new CenterOrientedPiece(structuredBlock);
+        coPiece.rotateClockWiseAQuarter();
+    }
+    public void moveFor(Vector3 distance) {
+        structuredBlock.moveFor(distance);
     }
     public void reset() {
         // TODO
     }
     public float blockSize() {
-        return UnityUtils.getWidthOfUIElement(renderedBlocks[0]);
+        return structuredBlock.getBlockSize();
     }
 }
 
 public class RenderedPuzzle {
     private List<List<GameObject>> renderedBlocks;
     private List<List<bool>> isOccupied;
-    private float rangePerHalfBlockSize = 0.9f;
+    private const float rangePerHalfBlockSize = 0.9f;
 
     public RenderedPuzzle(List<List<GameObject>> renderedBlocks) {
         this.renderedBlocks = renderedBlocks;
