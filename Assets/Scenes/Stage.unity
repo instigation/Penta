@@ -337,7 +337,7 @@ GameObject:
   - component: {fileID: 562352063}
   - component: {fileID: 562352065}
   m_Layer: 0
-  m_Name: PuzzleRenderer
+  m_Name: PuzzleSetRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
