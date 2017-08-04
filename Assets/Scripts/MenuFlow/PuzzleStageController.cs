@@ -5,11 +5,12 @@ using UnityEngine;
 public class PuzzleStageController : MonoBehaviour {
     public PuzzleSetRenderer __renderer;
     public PieceController __controller;
-    private GeneralInput input;
     public GameObject __canvas;
+    private GeneralInput input;
+    private RenderedPuzzleSet puzzleSet;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         renderPuzzle();
         if (Application.platform == RuntimePlatform.Android)
             input = new TouchInputWrapper();
@@ -17,10 +18,16 @@ public class PuzzleStageController : MonoBehaviour {
             var rect = __canvas.GetComponent<RectTransform>().rect;
             input = new MouseInputWrapper(rect.width, rect.height);
         }
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+    private void renderPuzzle() {
+        PuzzleGenerator generator = new PuzzleGenerator(4, Difficulty.HARD);
+        Puzzle p = generator.generatePuzzle();
+        puzzleSet = __renderer.render(p);
+        __controller.setPuzzleSet(puzzleSet);
+    }
+
+    // Update is called once per frame
+    void Update () {
         input.update();
         if(!input.noTouching()) {
             //only process the first touch
@@ -35,15 +42,17 @@ public class PuzzleStageController : MonoBehaviour {
             else if (input.touchEnded()) {
                 Debug.Log("touch ended!");
                 __controller.tryToInsertSelected();
+                if (puzzleSet.board.isSolved())
+                    clearStage();
             }
         }
     }
-
-    public void renderPuzzle() {
-        PuzzleGenerator generator = new PuzzleGenerator(4, Difficulty.HARD);
-        Puzzle p = generator.generatePuzzle();
-        RenderedPuzzleSet puzzleSet = __renderer.render(p);
-        __controller.setPuzzleSet(puzzleSet);
+    private void clearStage() {
+        clearPuzzle();
+        renderPuzzle();
+    }
+    private void clearPuzzle() {
+        puzzleSet.destroy();
     }
 }
 

@@ -14,6 +14,7 @@ public class PuzzleSetRenderer : MonoBehaviour {
     public GameObject __candidateLeftMostBlockSpawnPoint;
     public float __gapBtwBlocks;
     public bool __randomizeRotation = false;
+    private Vector3 spawnPosition;
 
     public RenderedPuzzleSet render(Puzzle p) {
         ///<summary>
@@ -30,22 +31,21 @@ public class PuzzleSetRenderer : MonoBehaviour {
         // 여기서 deep copy된 걸로 받아야 함.
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
         List<RenderedPiece> ret = new List<RenderedPiece>();
+        spawnPosition = UnityUtils.getPositionOfUIElement(__candidateLeftMostBlockSpawnPoint);
         for (int i = 0; i < piecesInCoordinate.Count; i++) {
             List<Coordinate> pieceInCoordinate = piecesInCoordinate[i];
             if (__randomizeRotation)
                 Utils.rotateRandomly(pieceInCoordinate);
             Utils.leftMostToOrigin(pieceInCoordinate);
             PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __gapPerBlockSize);
-            RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, __candidateLeftMostBlockSpawnPoint);
-            moveSpawnPointToRightEndOf(renderedPiece);
+            RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnPosition);
+            setSpawnPositionBasedOn(renderedPiece);
             ret.Add(renderedPiece);
         }
         return ret;
     }
-    private void moveSpawnPointToRightEndOf(RenderedPiece renderedPiece) {
-        Vector3 rightMostPosition = UnityUtils.getPositionOfUIElement(__candidateLeftMostBlockSpawnPoint);
-        rightMostPosition.x = renderedPiece.getRightMostXPosition() + __gapBtwBlocks;
-        UnityUtils.moveUIElementToPosition(__candidateLeftMostBlockSpawnPoint, rightMostPosition);
+    private void setSpawnPositionBasedOn(RenderedPiece renderedPiece) {
+        spawnPosition.x = renderedPiece.getRightMostXPosition() + __gapBtwBlocks;
     }
     private RenderedPuzzle renderPuzzle(Puzzle p) {
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
@@ -65,8 +65,7 @@ public class PieceRenderer {
         this.pieceBlock = pieceBlock;
         this.gapPerBlockSize = gapPerBlockSize;
     }
-    public RenderedPiece render(List<Coordinate> blocks, GameObject leftMost) {
-        leftMostPosition = UnityUtils.getPositionOfUIElement(leftMost);
+    public RenderedPiece render(List<Coordinate> blocks, Vector3 leftMostPosition) {
         return renderBlocksAtOrigin(blocks, leftMostPosition);
     }
     private RenderedPiece renderBlocksAtOrigin(List<Coordinate> blocks, Vector3 originPosition) {
@@ -104,34 +103,30 @@ public class PuzzleRenderer {
         this.gapPerBlockSize = gapPerBlockSize;
     }
     public RenderedPuzzle render(List<List<Coordinate>> pieces, GameObject centerOfBoard) {
-        List<List<GameObject>> renderedBlocks = new List<List<GameObject>>();
         float distance = blockSize() * (1 + gapPerBlockSize);
         Vector3 centerPosition = UnityUtils.getPositionOfUIElement(centerOfBoard);
-        foreach (List<Coordinate> piece in pieces) {
-            foreach (Coordinate block in piece) {
-                Vector3 position = centerPosition + distance * UnityUtils.toVector3(block);
-                renderBackgroundBlockAt(position);
-            }
-        }
+        List<List<GameObject>> background = renderBlocks(pieces, centerPosition, distance, boardBlockBackground);
+        List<List<GameObject>> board = renderBlocks(pieces, centerPosition, distance, boardBlock);
+        return new RenderedPuzzle(board, background);
+    }
+    private List<List<GameObject>> renderBlocks(List<List<Coordinate>> pieces, Vector3 centerPosition, float distance, GameObject blockObject) {
+        List<List<GameObject>> renderedBlocks = new List<List<GameObject>>();
         foreach (List<Coordinate> piece in pieces) {
             List<GameObject> newPiece = new List<GameObject>();
             foreach (Coordinate block in piece) {
                 Vector3 position = centerPosition + distance * UnityUtils.toVector3(block);
-                GameObject renderedBlock = renderBlockAt(position);
+                GameObject renderedBlock = renderBlockAt(position, blockObject);
                 newPiece.Add(renderedBlock);
             }
             renderedBlocks.Add(newPiece);
         }
-        return new RenderedPuzzle(renderedBlocks);
+        return renderedBlocks;
     }
     private float blockSize() {
         return UnityUtils.getWidthOfUIElement(boardBlock);
     }
-    private void renderBackgroundBlockAt(Vector3 position) {
-        MonoBehaviourUtils.renderBlockWithPosition(boardBlockBackground, position);
-    }
-    private GameObject renderBlockAt(Vector3 position) {
-        return MonoBehaviourUtils.renderBlockWithPosition(boardBlock, position);
+    private GameObject renderBlockAt(Vector3 position, GameObject block) {
+        return MonoBehaviourUtils.renderBlockWithPosition(block, position);
     }
     public void showAns() {
         // 정답을 rendering하게 되면 정답이 조각보다 위에 위치해서

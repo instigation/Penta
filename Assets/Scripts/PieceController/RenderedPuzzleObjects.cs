@@ -10,6 +10,11 @@ public class RenderedPuzzleSet {
         this.candidates = candidates;
         this.board = board;
     }
+    public void destroy() {
+        foreach (RenderedPiece candidate in candidates)
+            candidate.destroy();
+        board.destroy();
+    }
 }
 
 public class StructuredPiece {
@@ -100,15 +105,22 @@ public class RenderedPiece : StructuredPiece{
         }
         return false;
     }
+    public void destroy() {
+        foreach(GameObject block in blocks) {
+            Object.Destroy(block);
+        }
+    }
 }
 
 public class RenderedPuzzle {
     private List<List<GameObject>> board;
+    private List<List<GameObject>> background;
     private List<List<bool>> isOccupied;
     private const float rangePerHalfBlockSize = 0.9f;
 
-    public RenderedPuzzle(List<List<GameObject>> renderedBlocks) {
-        board = renderedBlocks;
+    public RenderedPuzzle(List<List<GameObject>> board, List<List<GameObject>> background) {
+        this.board = board;
+        this.background = background;
         initMaskAsLengthOfBlocks(ref isOccupied);
     }
     private void initMaskAsLengthOfBlocks(ref List<List<bool>> mask) {
@@ -224,5 +236,20 @@ public class RenderedPuzzle {
             foreach (bool b in a)
                 Debug.Log(b);
         Debug.Log("end====================");
+    }
+    public void destroy() {
+        destroyBackground();
+        destroyBoard();
+    }
+    private void destroyBackground() {
+        destroyDoubleListedGameObject(background);
+    }
+    private void destroyBoard() {
+        destroyDoubleListedGameObject(board);
+    }
+    private void destroyDoubleListedGameObject(List<List<GameObject>> target) {
+        foreach (List<GameObject> subList in target)
+            foreach (GameObject element in subList)
+                Object.Destroy(element);
     }
 }
