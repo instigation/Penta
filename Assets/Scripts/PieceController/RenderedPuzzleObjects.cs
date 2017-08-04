@@ -82,10 +82,9 @@ public class RenderedPiece : StructuredPiece{
     Vector3 origin;
 
     public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) 
-        :base(rBlocks, blocks) {
-        origin = centerPosition();
-    }
+        :base(rBlocks, blocks) { }
     public void rotate() {
+        origin = centerPosition();
         rotateClockWiseAQuarterWithOriginPosition(origin);
     }
     public void reset() {

@@ -251,8 +251,11 @@ public class PlacedPiece {
         }
         return ret;
     }
-    private int touchingRange(Piece p, Rotation rot) {
-        return 1 + piece.distanceFromCenterToEnd(rot) + p.distanceFromCenterToEnd(Rotator.reverse(rot));
+    private int touchingRange(Piece p, Rotation direction) {
+        return 
+            1 + 
+            piece.distanceFromCenterToEnd(direction) + 
+            p.distanceFromCenterToEnd(Rotator.reverse(direction));
     }
     public int touchingSideWith(PlacedPiece other) {
         ///<param name="other">
