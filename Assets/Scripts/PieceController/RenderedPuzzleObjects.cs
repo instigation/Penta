@@ -82,9 +82,10 @@ public class RenderedPiece : StructuredPiece{
     Vector3 origin;
 
     public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) 
-        :base(rBlocks, blocks) {}
-    public void rotate() {
+        :base(rBlocks, blocks) {
         origin = centerPosition();
+    }
+    public void rotate() {
         rotateClockWiseAQuarterWithOriginPosition(origin);
     }
     public void reset() {
@@ -152,17 +153,18 @@ public class RenderedPuzzle {
         private void compareOne(Vector3 blockPosition) {
             for (int i = 0; i < board.Count; i++) {
                 for (int j = 0; j < board[i].Count; j++) {
-                    Vector3 position = UnityUtils.getPositionOfUIElement(board[i][j]);
+                    Vector3 center = UnityUtils.getPositionOfUIElement(board[i][j]);
                     float blockSize = UnityUtils.getWidthOfUIElement(board[i][j]);
                     float range = (blockSize / 2) * rangePerHalfBlockSize;
-                    if (Vector3.Distance(blockPosition, position) < range) {
+                    var rangeSquare = new UnityUtils.Square(center, range * 2);
+                    if (rangeSquare.includes(blockPosition)) {
                         if (covered[i][j]) {
                             coveredIndexes.Add(new Coordinate(i, j));
                             isTargetFits = false;
                             return;
                         }
                         else {
-                            delta = position - blockPosition;
+                            delta = center - blockPosition;
                             fittedIndexes.Add(new Coordinate(i, j));
                             isTargetCovered = false;
                             return;

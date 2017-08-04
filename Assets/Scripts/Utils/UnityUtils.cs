@@ -41,9 +41,9 @@ public static class UnityUtils{
         }
         public bool includes(Vector3 point) {
             return
-                (Mathf.Abs(center.x - point.x) < sideLength)
+                (Mathf.Abs(center.x - point.x) < sideLength/2)
                 &&
-                (Mathf.Abs(center.y - point.y) < sideLength);
+                (Mathf.Abs(center.y - point.y) < sideLength/2);
         }
     }
 }
