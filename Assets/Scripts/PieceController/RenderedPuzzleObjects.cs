@@ -13,8 +13,8 @@ public class RenderedPuzzleSet {
 }
 
 public class StructuredPiece {
-    private List<GameObject> blocks;
-    private List<Coordinate> coors;
+    protected List<GameObject> blocks;
+    protected List<Coordinate> coors;
 
     public StructuredPiece(List<GameObject> blocks, List<Coordinate> coors) {
         this.blocks = blocks;
@@ -69,7 +69,7 @@ public class StructuredPiece {
         }
         return maxXPos;
     }
-    public float getBlockSize() {
+    public float blockSize() {
         return UnityUtils.getWidthOfUIElement(blocks[0]);
     }
     public void moveFor(Vector3 distance) {
@@ -78,51 +78,27 @@ public class StructuredPiece {
     }
 }
 
-public abstract class OrientedPiece {
-    protected Vector3 origin;
-    protected StructuredPiece piece;
-    public OrientedPiece(StructuredPiece piece) {
-        this.piece = piece;
-    }
-    public void rotateClockWiseAQuarter() {
-        piece.rotateClockWiseAQuarterWithOriginPosition(origin);
-    }
-}
-public class CenterOrientedPiece : OrientedPiece {
-    public CenterOrientedPiece(StructuredPiece piece) : base(piece) {
-        origin = piece.centerPosition();
-    }
-}
-public class LeftMostOrientedPiece : OrientedPiece {
-    public LeftMostOrientedPiece(StructuredPiece piece) : base(piece) {
-        origin = piece.leftMostPosition();
-    }
-}
+public class RenderedPiece : StructuredPiece{
+    Vector3 origin;
 
-public class RenderedPiece {
-    private StructuredPiece structuredBlock;
-
-    public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) {
-        structuredBlock = new StructuredPiece(rBlocks, blocks);
-    }
-    public List<Vector3> getBlockPositions() {
-        return structuredBlock.getBlockPositions();
-    }
-    public float getRightMostXPosition() {
-        return structuredBlock.getRightMostXPosition();
-    }
+    public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) 
+        :base(rBlocks, blocks) {}
     public void rotate() {
-        CenterOrientedPiece coPiece = new CenterOrientedPiece(structuredBlock);
-        coPiece.rotateClockWiseAQuarter();
-    }
-    public void moveFor(Vector3 distance) {
-        structuredBlock.moveFor(distance);
+        origin = centerPosition();
+        rotateClockWiseAQuarterWithOriginPosition(origin);
     }
     public void reset() {
         // TODO
     }
-    public float blockSize() {
-        return structuredBlock.getBlockSize();
+    public bool includes(Vector3 point) {
+        List<Vector3> blocks = getBlockPositions();
+        float sideLength = blockSize();
+        foreach(Vector3 block in blocks) {
+            var square = new UnityUtils.Square(block, sideLength);
+            if (square.includes(point))
+                return true;
+        }
+        return false;
     }
 }
 

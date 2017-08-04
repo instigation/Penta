@@ -31,4 +31,19 @@ public static class UnityUtils{
     public static Vector3 rotateClockwiseAQuater(Vector3 vector) {
         return new Vector3(vector.y, -vector.x);
     }
+
+    public class Square {
+        private Vector3 center;
+        private float sideLength;
+        public Square(Vector3 center, float sideLength) {
+            this.center = center;
+            this.sideLength = sideLength;
+        }
+        public bool includes(Vector3 point) {
+            return
+                (Mathf.Abs(center.x - point.x) < sideLength)
+                &&
+                (Mathf.Abs(center.y - point.y) < sideLength);
+        }
+    }
 }
