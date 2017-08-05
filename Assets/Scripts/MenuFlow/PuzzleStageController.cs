@@ -12,18 +12,35 @@ public class PuzzleStageController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         renderPuzzle();
+        setInput();
+    }
+    private void renderPuzzle() {
+        int num = resolveNum();
+        Difficulty difficulty = resolveDifficulty();
+        PuzzleGenerator generator = new PuzzleGenerator(num, difficulty);
+        Puzzle p = generator.generatePuzzle();
+        puzzleSet = __renderer.render(p);
+        __controller.setPuzzleSet(puzzleSet);
+    }
+    private int resolveNum() {
+        return (int)resolve("num", 4);
+    }
+    private Difficulty resolveDifficulty() {
+        return (Difficulty)resolve("difficulty", Difficulty.HARD);
+    }
+    private object resolve(object key, object defaultForNoKey) {
+        if (GlobalInformation.contains(key))
+            return GlobalInformation.getValue(key);
+        else
+            return defaultForNoKey;
+    }
+    private void setInput() {
         if (Application.platform == RuntimePlatform.Android)
             input = new TouchInputWrapper();
         else {
             var rect = __canvas.GetComponent<RectTransform>().rect;
             input = new MouseInputWrapper(rect.width, rect.height);
         }
-    }
-    private void renderPuzzle() {
-        PuzzleGenerator generator = new PuzzleGenerator(4, Difficulty.HARD);
-        Puzzle p = generator.generatePuzzle();
-        puzzleSet = __renderer.render(p);
-        __controller.setPuzzleSet(puzzleSet);
     }
 
     // Update is called once per frame
@@ -144,5 +161,4 @@ public class MouseInputWrapper : GeneralInput {
         mousePosition = position();
         return ret;
     }
-
 }

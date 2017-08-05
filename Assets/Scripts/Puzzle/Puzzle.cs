@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System; // for Abs
 
+
 public enum Difficulty { EASY, NORMAL, HARD }
 public class DifficultyIterator {
     private Difficulty diff;

@@ -34,7 +34,6 @@ public class StructuredPiece {
         return getOriginPosition();
     }
     private Vector3 getOriginPosition() {
-        List<Vector3> blockPositions = UnityUtils.getPositionsOfUIElements(blocks);
         Vector3 defalutPosition = UnityUtils.getPositionOfUIElement(blocks[0]);
         float x = defalutPosition.x, y = defalutPosition.y;
         for (int i = 0; i < coors.Count; i++) {

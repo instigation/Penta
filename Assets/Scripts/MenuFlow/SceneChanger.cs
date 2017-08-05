@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SceneChanger : MonoBehaviour {
+    public FadeOut __fadeOut;
+    public SceneLoader __sceneLoader;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public void changeScene(string newScene) {
+        __fadeOut.changeScene();
+        __sceneLoader.loadScene(newScene);
+    }
+    public void changeStage(int num) {
+        __fadeOut.changeScene();
+        __sceneLoader.loadStage(num);
+    }
 }
