@@ -35,7 +35,7 @@ public class PuzzleSetRenderer : MonoBehaviour {
         for (int i = 0; i < piecesInCoordinate.Count; i++) {
             List<Coordinate> pieceInCoordinate = piecesInCoordinate[i];
             if (__randomizeRotation)
-                Utils.rotateRandomly(pieceInCoordinate);
+                Utils.rotateRandomlySavingWidth(pieceInCoordinate);
             Utils.leftMostToOrigin(pieceInCoordinate);
             PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __gapPerBlockSize);
             RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnPosition);

@@ -3,6 +3,9 @@ using System;
 using UnityEngine;
 
 public static class Utils {
+    /// <summary>
+    /// set이란 connected blocks.
+    /// </summary>
     private const int MIN_INT = -1000;
     private const int MAX_INT = 1000;
     private static System.Random rng = new System.Random();
@@ -96,6 +99,13 @@ public static class Utils {
         return new Coordinate(minX, (minY + maxY) / 2);
     }
 
+    public static void rotateRandomlySavingWidth(List<Coordinate> set) {
+        rotateRandomly(set);
+        int height = getHeight(set);
+        int width = getWidth(set);
+        if (height < width)
+            rotateSetForTimes(set, 1);
+    }
     public static void rotateRandomly(List<Coordinate> set) {
         int randomRotation = rng.Next(Rotator.numRotation());
         rotateSetForTimes(set, randomRotation);
@@ -109,6 +119,17 @@ public static class Utils {
         }
     }
 
+    public static int getHeight(List<Coordinate> set) {
+        int count = 0;
+        List<int> occuredYCoordinates = new List<int>();
+        foreach (Coordinate point in set) {
+            if (!occuredYCoordinates.Contains(point.y)) {
+                occuredYCoordinates.Add(point.y);
+                count++;
+            }
+        }
+        return count;
+    }
     public static int getWidth(List<Coordinate> set) {
         int count = 0;
         List<int> occuredXCoordinates = new List<int>();
