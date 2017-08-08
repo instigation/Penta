@@ -8,7 +8,7 @@ public class MonoBehaviourUtils : MonoBehaviour {
     /// 상속받아서 이상해질 수 있으므로.
     /// </summary>
     // below line이 될지 모르겠지만 일단 이렇게 해보자
-    public GameObject __canvas;
+    public GameObject __parent;
     private static MonoBehaviourUtils singleton = null;
     private MonoBehaviourUtils() {
         // below line은 문제가 많음
@@ -26,7 +26,7 @@ public class MonoBehaviourUtils : MonoBehaviour {
     
     private GameObject renderBlockWithPositionAtSingleton(GameObject target, Vector2 position) {
         GameObject ret = Instantiate(target);
-        ret.transform.SetParent(__canvas.transform);
+        ret.transform.SetParent(__parent.transform);
         UnityUtils.moveUIElementToPosition(ret, position);
         return ret;
     }

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class SceneLoader : MonoBehaviour {
     public void loadStage(int num) {
         GlobalInformation.storeKeyValue("num", num);
-        GlobalInformation.storeKeyValue("difficulty", Difficulty.NORMAL);
+        GlobalInformation.storeKeyValue("difficulty", Difficulty.HARD);
         loadScene("Stage");
     }
     public void loadScene(string newScene) {

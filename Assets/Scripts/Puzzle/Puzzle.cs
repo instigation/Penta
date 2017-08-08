@@ -36,6 +36,10 @@ public class PuzzleGenerator {
         /// <param name="num_pieces">0에서 10 사이의 숫자를 넣을 것</param>
         puzzle = new Puzzle();
         while (puzzle.size() < num_pieces) {
+            if (puzzle.size() == 2)
+                puzzle_difficulty = Difficulty.NORMAL;
+            else if (puzzle.size() == 4)
+                puzzle_difficulty = Difficulty.EASY;
             PlacedPiece fitted_piece = findTheHardestFit();
             puzzle.add(fitted_piece);
         }
@@ -57,9 +61,9 @@ public class PuzzleGenerator {
     private int determineHurdle(int piece_index) {
         int hurdle;
         if (piece_index <= 2)
-            hurdle = (int)puzzle_difficulty + 1;
+            hurdle = 4;
         else
-            hurdle = (int)puzzle_difficulty;
+            hurdle = 3;
         return hurdle;
     }
     private PlacedPiece findPieceThatSatisfiesHurdle(int hurdle) {
