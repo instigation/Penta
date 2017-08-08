@@ -42,67 +42,76 @@ public static class Utils {
         }
     }
 
-    public static void centerToOrigin(List<List<Coordinate>> coors) {
-        Coordinate center = centerOfEnvelope(coors);
-        for(int i = 0; i < coors.Count; i++) {
-            for(int j = 0; j < coors[i].Count; j++) {
-                coors[i][j] -= center;
+    private class Envelope {
+        Coordinate min, max;
+        public Envelope(List<Coordinate> set) {
+            if (set.Count == 0) {
+                min = new Coordinate(0, 0);
+                // 이래야 getWidth/Height 할때 0이 나옴
+                max = new Coordinate(-1, -1);
+            }
+            else {
+                min = new Coordinate(set[0]);
+                max = new Coordinate(set[0]);
+                foreach(Coordinate point in set) {
+                    if (point.x < min.x)
+                        min.x = point.x;
+                    if (point.x > max.x)
+                        max.x = point.x;
+                    if (point.y < min.y)
+                        min.y = point.y;
+                    if (point.y > max.y)
+                        max.y = point.y;
+                }
+            }
+        }
+        public Coordinate center() {
+            return new Coordinate((min.x + max.x) / 2, (min.y + max.y) / 2);
+        }
+        public Coordinate leftMost() {
+            return new Coordinate(min.x, (min.y + max.y) / 2);
+        }
+        public int getWidth() {
+            return max.x - min.x + 1;
+        }
+        public int getHeight() {
+            return max.y - min.y + 1;
+        }
+    }
+    public static void centerToOrigin(List<List<Coordinate>> set) {
+        Coordinate center = centerOfEnvelope(set);
+        for(int i = 0; i < set.Count; i++) {
+            for(int j = 0; j < set[i].Count; j++) {
+                set[i][j] -= center;
             }
         }
     }
-    private static Coordinate centerOfEnvelope(List<List<Coordinate>> coors) {
-        List<Coordinate> mergedCoors = new List<Coordinate>();
-        foreach(List<Coordinate> sub in coors) {
-            mergedCoors.AddRange(sub);
+    private static Coordinate centerOfEnvelope(List<List<Coordinate>> set) {
+        List<Coordinate> mergedSet = new List<Coordinate>();
+        foreach(List<Coordinate> sub in set) {
+            mergedSet.AddRange(sub);
         }
-        return centerOfEnvelope(mergedCoors);
+        return (new Envelope(mergedSet)).center();
     }
-    public static void centerToOrigin(List<Coordinate> coors) {
-        Coordinate center = centerOfEnvelope(coors);
-        for (int i = 0; i < coors.Count; i++)
-            coors[i] -= center;
-    }
-    private static Coordinate centerOfEnvelope(List<Coordinate> coors) {
-        int minX, minY, maxX, maxY;
-        minX = minY = MAX_INT;
-        maxX = maxY = MIN_INT;
-        foreach(Coordinate coor in coors) {
-            if (coor.x < minX)
-                minX = coor.x;
-            if (coor.x > maxX)
-                maxX = coor.x;
-            if (coor.y < minY)
-                minY = coor.y;
-            if (coor.y > maxY)
-                maxY = coor.y;
-        }
-        return new Coordinate((minX + maxX)/2, (minY + maxY)/2);
+    public static void centerToOrigin(List<Coordinate> set) {
+        Envelope envelope = new Envelope(set);
+        Coordinate center = envelope.center();
+        for (int i = 0; i < set.Count; i++)
+            set[i] -= center;
     }
 
-    public static void leftMostToOrigin(List<Coordinate> coors) {
-        Coordinate leftMostPoint = leftMostOfEnvelope(coors);
-        for(int i = 0; i < coors.Count; i++)
-            coors[i] -= leftMostPoint;
-    }
-    private static Coordinate leftMostOfEnvelope(List<Coordinate> set) {
-        int minX, minY, maxY;
-        minX = minY = MAX_INT;
-        maxY = MIN_INT;
-        foreach (Coordinate coor in set) {
-            if (coor.x < minX)
-                minX = coor.x;
-            if (coor.y < minY)
-                minY = coor.y;
-            if (coor.y > maxY)
-                maxY = coor.y;
-        }
-        return new Coordinate(minX, (minY + maxY) / 2);
+    public static void leftMostToOrigin(List<Coordinate> set) {
+        Envelope envelope = new Envelope(set);
+        Coordinate leftMostPoint = envelope.leftMost();
+        for (int i = 0; i < set.Count; i++)
+            set[i] -= leftMostPoint;
     }
 
     public static void rotateRandomlySavingWidth(List<Coordinate> set) {
         rotateRandomly(set);
-        int height = getHeight(set);
-        int width = getWidth(set);
+        Envelope envelope = new Envelope(set);
+        int height = envelope.getHeight();
+        int width = envelope.getWidth();
         if (height < width)
             rotateSetForTimes(set, 1);
     }
@@ -117,28 +126,5 @@ public static class Utils {
             Coordinate result = rotatePointToRotation(vectorFromCenter, (Rotation) times);
             set[i] = result + center;
         }
-    }
-
-    public static int getHeight(List<Coordinate> set) {
-        int count = 0;
-        List<int> occuredYCoordinates = new List<int>();
-        foreach (Coordinate point in set) {
-            if (!occuredYCoordinates.Contains(point.y)) {
-                occuredYCoordinates.Add(point.y);
-                count++;
-            }
-        }
-        return count;
-    }
-    public static int getWidth(List<Coordinate> set) {
-        int count = 0;
-        List<int> occuredXCoordinates = new List<int>();
-        foreach(Coordinate point in set) {
-            if (!occuredXCoordinates.Contains(point.x)) {
-                occuredXCoordinates.Add(point.x);
-                count++;
-            }
-        }
-        return count;
     }
 }
