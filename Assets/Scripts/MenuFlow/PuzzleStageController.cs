@@ -1,11 +1,12 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class PuzzleStageController : MonoBehaviour {
     public PuzzleSetRenderer __renderer;
     public PieceController __controller;
     public GameObject __canvas;
+    public ScoreChanger __scoreChanger;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
 
@@ -66,7 +67,11 @@ public class PuzzleStageController : MonoBehaviour {
     }
     private void clearStage() {
         clearPuzzle();
+        addScore(50);
         renderPuzzle();
+    }
+    private void addScore(int amount) {
+        StartCoroutine(__scoreChanger.changeGradually(amount));
     }
     private void clearPuzzle() {
         puzzleSet.destroy();
