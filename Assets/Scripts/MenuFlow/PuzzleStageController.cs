@@ -13,6 +13,7 @@ public class PuzzleStageController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         renderPuzzle();
+        renderAd();
         setInput();
     }
     private void renderPuzzle() {
@@ -34,6 +35,9 @@ public class PuzzleStageController : MonoBehaviour {
             return GlobalInformation.getValue(key);
         else
             return defaultForNoKey;
+    }
+    private void renderAd() {
+        BannerMaker.requestBanner();
     }
     private void setInput() {
         if (Application.platform == RuntimePlatform.Android)

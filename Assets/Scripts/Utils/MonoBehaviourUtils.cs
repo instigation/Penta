@@ -26,7 +26,7 @@ public class MonoBehaviourUtils : MonoBehaviour {
     
     private GameObject renderBlockWithPositionAtSingleton(GameObject target, Vector2 position) {
         GameObject ret = Instantiate(target);
-        ret.transform.SetParent(__parent.transform);
+        ret.transform.SetParent(__parent.transform, false);
         UnityUtils.moveUIElementToPosition(ret, position);
         return ret;
     }
