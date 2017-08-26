@@ -7,14 +7,19 @@ public class PuzzleStageController : MonoBehaviour {
     public PieceController __controller;
     public GameObject __canvas;
     public ScoreChanger __scoreChanger;
+    public GameObject __workingArea;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
+    private AndroidLogger logger;
 
     // Use this for initialization
     void Start () {
         renderPuzzle();
         renderAd();
         setInput();
+    }
+    private void setAndroidLogger() {
+        logger = new AndroidLogger();
     }
     private void renderPuzzle() {
         int num = resolveNum();
@@ -40,12 +45,9 @@ public class PuzzleStageController : MonoBehaviour {
         BannerMaker.requestBanner();
     }
     private void setInput() {
-        if (Application.platform == RuntimePlatform.Android)
-            input = new TouchInputWrapper();
-        else {
-            var rect = __canvas.GetComponent<RectTransform>().rect;
-            input = new MouseInputWrapper(rect.width, rect.height);
-        }
+        var rect = __canvas.GetComponent<RectTransform>().rect;
+        InputValidator workingspaceValidator = new WorkingspaceValidator(__workingArea);
+        input = new MouseInputWrapper(rect.width, rect.height, workingspaceValidator);
     }
 
     // Update is called once per frame
@@ -79,95 +81,5 @@ public class PuzzleStageController : MonoBehaviour {
     }
     private void clearPuzzle() {
         puzzleSet.destroy();
-    }
-}
-
-public interface GeneralInput {
-    void update();
-    bool noTouching();
-    bool touchBegan();
-    bool touchMoved();
-    bool touchEnded();
-    Vector3 position();
-    Vector3 deltaPosition();
-}
-
-public class TouchInputWrapper : GeneralInput {
-    public void update() { }
-    public bool noTouching() {
-        return Input.touchCount == 0;
-    }
-    public bool touchBegan() {
-        return Input.touches[0].phase == TouchPhase.Began;
-    }
-    public bool touchMoved() {
-        return Input.touches[0].phase == TouchPhase.Moved;
-    }
-    public bool touchEnded() {
-        return Input.touches[0].phase == TouchPhase.Ended;
-    }
-    public Vector3 position() {
-        return Input.touches[0].position;
-    }
-    public Vector3 deltaPosition() {
-        return Input.touches[0].deltaPosition;
-    }
-}
-
-public class MouseInputWrapper : GeneralInput {
-    private enum state {BEGAN, MOVED, ENDED, IDLE };
-    private state current = state.IDLE;
-    private Vector3 mousePosition;
-    private float canvasWidth;
-    private float canvasHeight;
-
-    public MouseInputWrapper(float canvasWidth, float canvasHeight) {
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
-    }
-    public void update() {
-        stateTransition();
-        if (touchBegan())
-            mousePosition = position();
-    }
-    private void stateTransition() {
-        if(current == state.IDLE) {
-            if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.R))
-                current = state.BEGAN;
-        }
-        else if(current == state.BEGAN) {
-            current = state.MOVED;
-        }
-        else if(current == state.MOVED) {
-            if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.R))
-                current = state.ENDED;
-        }
-        else if(current == state.ENDED) {
-            current = state.IDLE;
-        }
-    }
-    public bool noTouching() {
-        return (current == state.IDLE);
-    }
-    public bool touchBegan() {
-        return current == state.BEGAN;
-    }
-    public bool touchMoved() {
-        return current == state.MOVED;
-    }
-    public bool touchEnded() {
-        return current == state.ENDED;
-    }
-    public Vector3 position() {
-        Vector3 mousePos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        mousePos -= new Vector3(0.5f, 0.5f, 0.0f);
-        mousePos.x *= canvasWidth;
-        mousePos.y *= canvasHeight;
-        return mousePos;
-    }
-    public Vector3 deltaPosition() {
-        Vector3 ret = position() - mousePosition;
-        mousePosition = position();
-        return ret;
     }
 }

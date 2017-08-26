@@ -9,6 +9,7 @@ public class MonoBehaviourUtils : MonoBehaviour {
     /// </summary>
     // below line이 될지 모르겠지만 일단 이렇게 해보자
     public GameObject __parent;
+    public GameObject __textPrefab;
     private static MonoBehaviourUtils singleton = null;
     private MonoBehaviourUtils() {
         // below line은 문제가 많음
@@ -28,6 +29,15 @@ public class MonoBehaviourUtils : MonoBehaviour {
         GameObject ret = Instantiate(target);
         ret.transform.SetParent(__parent.transform, false);
         UnityUtils.moveUIElementToPosition(ret, position);
+        return ret;
+    }
+
+    public static GameObject renderText() {
+        return getInstance().renderTextSomewhere();
+    }
+    private GameObject renderTextSomewhere() {
+        GameObject ret = Instantiate(__textPrefab);
+        ret.transform.SetParent(__parent.transform, false);
         return ret;
     }
 }
