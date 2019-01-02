@@ -33,7 +33,7 @@ public class StructuredPiece {
         Utils.leftMostToOrigin(coors);
         return getOriginPosition();
     }
-    private Vector3 getOriginPosition() {
+    public Vector3 getOriginPosition() {
         Vector3 defalutPosition = UnityUtils.getPositionOfUIElement(blocks[0]);
         float x = defalutPosition.x, y = defalutPosition.y;
         for (int i = 0; i < coors.Count; i++) {
@@ -271,10 +271,15 @@ public class RenderedPuzzle {
         foreach (Coordinate index in indexes)
             isOccupied[index.x][index.y] = true;
     }
-    public void tryToExtract(List<Vector3> blockPositions) {
+    public bool tryToExtract(List<Vector3> blockPositions) {
         Comparer comp = new Comparer(board, isOccupied, blockPositions);
-        if(comp.isCovered())
+        if (comp.isCovered())
+        {
             releaseBlocksAt(comp.getCoveredIndexes());
+            return true;
+        }
+        else
+            return false;
     }
     private void releaseBlocksAt(List<Coordinate> indexes) {
         foreach (Coordinate index in indexes)

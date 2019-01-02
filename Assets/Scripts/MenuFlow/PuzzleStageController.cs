@@ -59,12 +59,13 @@ public class PuzzleStageController : MonoBehaviour {
                 Debug.Log("touch began!");
                 __controller.selectOnPosition(input.position(), __renderer.__gapBtwBlocks);
                 __controller.tryToExtractSelected();
+                __controller.moveSelectedTo(input.position());
             }
             else if (input.touchMoved()) {
                 __controller.moveSelectedFor(input.deltaPosition());
             }
             else if (input.touchEnded()) {
-                if (input.timeCollapsedAfterLastTouch() < 0.35f)
+                if (input.timeCollapsedAfterLastTouch() < 0.5f)
                     __controller.rotateSelected();
                 Debug.Log("touch ended!");
                 __controller.tryToInsertSelected();

@@ -6,13 +6,20 @@ using UnityEngine;
 public class PieceController : MonoBehaviour{
     // TODO : selected ?= NONE check를 없애자
     private List<RenderedPiece> candidates;
+    private List<bool> isInserted;
     private RenderedPuzzle board;
     private int selected = NONE;
     private const int NONE = -1;
-    
+
+
     public void setPuzzleSet(RenderedPuzzleSet puzzleSet) {
         candidates = puzzleSet.candidates;
         board = puzzleSet.board;
+
+        int n = candidates.Count;
+        isInserted = new List<bool>();
+        for (int i = 0; i < n; i++)
+            isInserted.Add(false);
     }
     public void rotateSelected() {
         if (selected != NONE)
@@ -21,9 +28,21 @@ public class PieceController : MonoBehaviour{
     public void selectOnPosition(Vector3 position, float padding) {
         for (int i = 0; i < candidates.Count; i++) {
             RenderedPiece candidate = candidates[i];
-            if (candidate.includesInNeighborhood(position, padding)) {
-                selected = i;
-                return;
+            if (isInserted[i])
+            {
+                if (candidate.includes(position))
+                {
+                    selected = i;
+                    return;
+                }
+            }
+            else
+            {
+                if (candidate.includesInNeighborhood(position, padding))
+                {
+                    selected = i;
+                    return;
+                }
             }
         }
         unSelect();
@@ -31,6 +50,11 @@ public class PieceController : MonoBehaviour{
     public void moveSelectedFor(Vector3 distance) {
         if (selected != NONE)
             candidates[selected].moveFor(distance);
+    }
+    public void moveSelectedTo(Vector3 position)
+    {
+        if (selected != NONE)
+            candidates[selected].moveFor(position - candidates[selected].getOriginPosition());
     }
     private void unSelect() {
         selected = NONE;
@@ -41,6 +65,8 @@ public class PieceController : MonoBehaviour{
             Vector3 delta = board.tryToInsertAndReturnDelta(selectedPiece.getBlockPositions());
             if (!board.getRecentInsertionSuccess())
                 resetSelected();
+            else
+                isInserted[selected] = true;
             moveSelectedFor(delta);
         }
     }
@@ -60,7 +86,9 @@ public class PieceController : MonoBehaviour{
     public void tryToExtractSelected() {
         if(selected != NONE) {
             RenderedPiece selectedPiece = candidates[selected];
-            board.tryToExtract(selectedPiece.getBlockPositions());
+            bool extractionSuccess = board.tryToExtract(selectedPiece.getBlockPositions());
+            if (extractionSuccess)
+                isInserted[selected] = false;
         }
     }
 }
