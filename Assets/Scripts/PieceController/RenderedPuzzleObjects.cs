@@ -83,16 +83,20 @@ public class StructuredPiece {
 }
 
 public class RenderedPiece : StructuredPiece{
-    Vector3 origin;
+    private Vector3 centerOriginalPosition;
 
     public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) 
-        :base(rBlocks, blocks) { }
+        :base(rBlocks, blocks) {
+        centerOriginalPosition = centerPosition();
+    }
     public void rotate() {
+        Vector3 origin;
         origin = centerPosition();
         rotateClockWiseAQuarterWithOriginPosition(origin);
     }
     public void reset() {
-        // TODO
+        Vector3 currentOriginPosition = centerPosition();
+        moveFor(centerOriginalPosition - currentOriginPosition);
     }
     public bool includes(Vector3 point) {
         List<Vector3> blocks = getBlockPositions();
@@ -103,6 +107,26 @@ public class RenderedPiece : StructuredPiece{
                 return true;
         }
         return false;
+    }
+    public bool includesInNeighborhood(Vector3 point, float padding) {
+        List<Vector3> blocks = getBlockPositions();
+        float sideLength = blockSize();
+        float left=100000, right=-100000, top=-100000, bottom=100000;
+        foreach (Vector3 block in blocks) {
+            float x = block.x;
+            if (x < left)
+                left = x;
+            if (x > right)
+                right = x;
+            float y = block.y;
+            if (y > top)
+                top = y;
+            if (y < bottom)
+                bottom = y;
+        }
+        var rect = new UnityUtils.Rectangle(new Vector3((left+right)/2, (top+bottom)/2, 0), right-left+2*padding, top-bottom+2*padding);
+        return rect.includes(point);
+
     }
     public void destroy() {
         foreach(GameObject block in blocks) {
@@ -115,7 +139,8 @@ public class RenderedPuzzle {
     private List<List<GameObject>> board;
     private List<List<GameObject>> background;
     private List<List<bool>> isOccupied;
-    private const float rangePerHalfBlockSize = 0.9f;
+    private const float rangePerHalfBlockSize = 0.9999f;
+    private bool recentInsertionSuccess;
 
     public RenderedPuzzle(List<List<GameObject>> board, List<List<GameObject>> background) {
         this.board = board;
@@ -206,7 +231,10 @@ public class RenderedPuzzle {
         Comparer comp = new Comparer(board, isOccupied, blockPositions);
         if (comp.fits()) {
             occupyBlocksAt(comp.getFittedIndexes());
+            recentInsertionSuccess = true;
         }
+        else
+            recentInsertionSuccess = false;
         return comp.getDelta();
     }
     private void occupyBlocksAt(List<Coordinate> indexes) {
@@ -250,5 +278,8 @@ public class RenderedPuzzle {
         foreach (List<GameObject> subList in target)
             foreach (GameObject element in subList)
                 Object.Destroy(element);
+    }
+    public bool getRecentInsertionSuccess() {
+        return recentInsertionSuccess;
     }
 }

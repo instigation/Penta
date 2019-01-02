@@ -46,4 +46,20 @@ public static class UnityUtils{
                 (Mathf.Abs(center.y - point.y) < sideLength/2);
         }
     }
+
+    public class Rectangle {
+        private Vector3 center;
+        private float xLength, yLength;
+        public Rectangle(Vector3 center, float xLength, float yLength) {
+            this.center = center;
+            this.xLength = xLength;
+            this.yLength = yLength;
+        }
+        public bool includes(Vector3 point) {
+            return
+                (Mathf.Abs(center.x - point.x) < xLength / 2)
+                &&
+                (Mathf.Abs(center.y - point.y) < yLength / 2);
+        }
+    }
 }

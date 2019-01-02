@@ -57,13 +57,15 @@ public class PuzzleStageController : MonoBehaviour {
             //only process the first touch
             if (input.touchBegan()) {
                 Debug.Log("touch began!");
-                __controller.selectOnPosition(input.position());
+                __controller.selectOnPosition(input.position(), __renderer.__gapBtwBlocks);
                 __controller.tryToExtractSelected();
             }
             else if (input.touchMoved()) {
                 __controller.moveSelectedFor(input.deltaPosition());
             }
             else if (input.touchEnded()) {
+                if (input.timeCollapsedAfterLastTouch() < 0.35f)
+                    __controller.rotateSelected();
                 Debug.Log("touch ended!");
                 __controller.tryToInsertSelected();
                 if (puzzleSet.board.isSolved())

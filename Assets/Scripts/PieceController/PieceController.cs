@@ -18,15 +18,15 @@ public class PieceController : MonoBehaviour{
         if (selected != NONE)
             candidates[selected].rotate();
     }
-    public void selectOnPosition(Vector3 position) {
+    public void selectOnPosition(Vector3 position, float padding) {
         for (int i = 0; i < candidates.Count; i++) {
             RenderedPiece candidate = candidates[i];
-            if (candidate.includes(position)) {
+            if (candidate.includesInNeighborhood(position, padding)) {
                 selected = i;
                 return;
             }
         }
-        selected = NONE;
+        unSelect();
     }
     public void moveSelectedFor(Vector3 distance) {
         if (selected != NONE)
@@ -39,6 +39,8 @@ public class PieceController : MonoBehaviour{
         if(selected != NONE) {
             RenderedPiece selectedPiece = candidates[selected];
             Vector3 delta = board.tryToInsertAndReturnDelta(selectedPiece.getBlockPositions());
+            if (!board.getRecentInsertionSuccess())
+                resetSelected();
             moveSelectedFor(delta);
         }
     }

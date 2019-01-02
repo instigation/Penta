@@ -9,6 +9,8 @@ public interface GeneralInput {
     bool touchBegan();
     bool touchMoved();
     bool touchEnded();
+    // precondition: valid only during BEGAN~MOVED~ENDED
+    float timeCollapsedAfterLastTouch();
     Vector3 position();
     Vector3 deltaPosition();
 }
@@ -20,11 +22,14 @@ public class MouseInputWrapper : GeneralInput {
     private float canvasWidth;
     private float canvasHeight;
     private InputValidator validator;
+    private int lastTouchedFrame;
+    private float deltaTouchTime;
 
     public MouseInputWrapper(float canvasWidth, float canvasHeight, InputValidator validator) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
         this.validator = validator;
+        this.lastTouchedFrame = -1000;
     }
     public void update() {
         stateTransition();
@@ -32,8 +37,12 @@ public class MouseInputWrapper : GeneralInput {
     private void stateTransition() {
         if (current == state.IDLE) {
             mousePosition = position();
-            if (Input.GetMouseButtonDown(0) && validator.isValid(mousePosition))
+            if (Input.GetMouseButtonDown(0) && validator.isValid(mousePosition)) {
                 current = state.BEGAN;
+                int currentTouchedFrame = Time.frameCount;
+                deltaTouchTime = (currentTouchedFrame - lastTouchedFrame)*Time.deltaTime;
+                lastTouchedFrame = currentTouchedFrame;
+            }
         }
         else if (current == state.BEGAN) {
             current = state.MOVED;
@@ -69,5 +78,8 @@ public class MouseInputWrapper : GeneralInput {
         Vector3 ret = position() - mousePosition;
         mousePosition = position();
         return ret;
+    }
+    public float timeCollapsedAfterLastTouch() {
+        return deltaTouchTime;
     }
 }

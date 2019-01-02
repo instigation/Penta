@@ -45,7 +45,7 @@ public class PuzzleSetRenderer : MonoBehaviour {
         return ret;
     }
     private void setSpawnPositionBasedOn(RenderedPiece renderedPiece) {
-        spawnPosition.x = renderedPiece.getRightMostXPosition() + __gapBtwBlocks;
+        spawnPosition.x = renderedPiece.getRightMostXPosition() + __gapBtwBlocks + renderedPiece.blockSize();
     }
     private RenderedPuzzle renderPuzzle(Puzzle p) {
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
