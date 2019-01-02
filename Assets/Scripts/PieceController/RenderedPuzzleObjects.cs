@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class RenderedPuzzleSet {
     public List<RenderedPiece> candidates;
@@ -139,6 +139,8 @@ public class RenderedPuzzle {
     private List<List<GameObject>> board;
     private List<List<GameObject>> background;
     private List<List<bool>> isOccupied;
+    private List<List<bool>> isHighlighted;
+    private Color originalBoardColor;
     private const float rangePerHalfBlockSize = 0.9999f;
     private bool recentInsertionSuccess;
 
@@ -146,6 +148,9 @@ public class RenderedPuzzle {
         this.board = board;
         this.background = background;
         initMaskAsLengthOfBlocks(ref isOccupied);
+        foreach (List<GameObject> blockList in board)
+            foreach (GameObject block in blockList)
+                originalBoardColor = block.GetComponent<Image>().color;
     }
     private void initMaskAsLengthOfBlocks(ref List<List<bool>> mask) {
         mask = new List<List<bool>>();
@@ -224,6 +229,31 @@ public class RenderedPuzzle {
                 return coveredIndexes;
             else
                 return new List<Coordinate>();
+        }
+    }
+
+    public void highlightFittingCandidates(List<Vector3> blockPositions)
+    {
+        Comparer comp = new Comparer(board, isOccupied, blockPositions);
+        resetBlockColors();
+        if (comp.fits())
+            highlightBlocksAt(comp.getFittedIndexes());
+    }
+    private void highlightBlocksAt(List<Coordinate> indexes)
+    {
+        foreach (Coordinate index in indexes)
+        {
+            board[index.x][index.y].GetComponent<Image>().color = Color.green;
+        }
+    }
+    private void resetBlockColors()
+    {
+        foreach(List<GameObject> blockList in board)
+        {
+            foreach(GameObject block in blockList)
+            {
+                block.GetComponent<Image>().color = originalBoardColor;
+            }
         }
     }
 

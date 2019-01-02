@@ -71,6 +71,7 @@ public class PuzzleStageController : MonoBehaviour {
                 if (puzzleSet.board.isSolved())
                     clearStage();
             }
+            __controller.highlightBoardBySelected();
         }
     }
     private void clearStage() {

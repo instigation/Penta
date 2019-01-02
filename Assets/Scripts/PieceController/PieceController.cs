@@ -44,6 +44,15 @@ public class PieceController : MonoBehaviour{
             moveSelectedFor(delta);
         }
     }
+    public void highlightBoardBySelected()
+    {
+        if (selected != NONE)
+        {
+            RenderedPiece selectedPiece = candidates[selected];
+            board.highlightFittingCandidates(selectedPiece.getBlockPositions());
+        }
+
+    }
     private void resetSelected() {
         if (selected != NONE)
             candidates[selected].reset();
