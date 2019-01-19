@@ -32,7 +32,7 @@ public class PieceController : MonoBehaviour{
             {
                 if (candidate.includes(position))
                 {
-                    selected = i;
+                    select(i);
                     return;
                 }
             }
@@ -40,12 +40,11 @@ public class PieceController : MonoBehaviour{
             {
                 if (candidate.includesInNeighborhood(position, padding))
                 {
-                    selected = i;
+                    select(i);
                     return;
                 }
             }
         }
-        unSelect();
     }
     public void moveSelectedFor(Vector3 distance) {
         if (selected != NONE)
@@ -56,7 +55,11 @@ public class PieceController : MonoBehaviour{
         if (selected != NONE)
             candidates[selected].moveFor(position - candidates[selected].getOriginPosition());
     }
-    private void unSelect() {
+    private void select(int index) {
+        selected = index;
+        candidates[selected].setToBoardFitSize();
+    }
+    public void unSelect() {
         selected = NONE;
     }
     public void tryToInsertSelected() {
@@ -81,7 +84,10 @@ public class PieceController : MonoBehaviour{
     }
     private void resetSelected() {
         if (selected != NONE)
+        {
             candidates[selected].reset();
+            candidates[selected].setToCandidateSize();
+        }
     }
     public void tryToExtractSelected() {
         if(selected != NONE) {

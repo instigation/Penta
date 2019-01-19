@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using UnityEngine.UI;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PuzzleStageController : MonoBehaviour {
     public PuzzleSetRenderer __renderer;
     public PieceController __controller;
     public GameObject __canvas;
+    public Vector3 canvasPosition;
     public ScoreChanger __scoreChanger;
     public GameObject __workingArea;
     private GeneralInput input;
@@ -45,9 +44,8 @@ public class PuzzleStageController : MonoBehaviour {
         BannerMaker.requestBanner();
     }
     private void setInput() {
-        var rect = __canvas.GetComponent<RectTransform>().rect;
         InputValidator workingspaceValidator = new WorkingspaceValidator(__workingArea);
-        input = new MouseInputWrapper(rect.width, rect.height, workingspaceValidator);
+        input = new MouseInputWrapper(__canvas, workingspaceValidator);
     }
 
     // Update is called once per frame
@@ -57,7 +55,7 @@ public class PuzzleStageController : MonoBehaviour {
             //only process the first touch
             if (input.touchBegan()) {
                 Debug.Log("touch began!");
-                __controller.selectOnPosition(input.position(), __renderer.__gapBtwBlocks);
+                __controller.selectOnPosition(input.position(), __renderer.__gapBtwPieceBoxes/2);
                 __controller.tryToExtractSelected();
                 __controller.moveSelectedTo(input.position());
             }
@@ -65,10 +63,9 @@ public class PuzzleStageController : MonoBehaviour {
                 __controller.moveSelectedFor(input.deltaPosition());
             }
             else if (input.touchEnded()) {
-                if (input.timeCollapsedAfterLastTouch() < 0.5f)
-                    __controller.rotateSelected();
                 Debug.Log("touch ended!");
                 __controller.tryToInsertSelected();
+                __controller.unSelect();
                 if (puzzleSet.board.isSolved())
                     clearStage();
             }

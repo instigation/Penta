@@ -32,6 +32,19 @@ public class MonoBehaviourUtils : MonoBehaviour {
         return ret;
     }
 
+    public static GameObject renderBlockWithPositionWithParent(GameObject target, Vector2 position, GameObject parent)
+    {
+        return getInstance().renderBlockWithPositionWithParentAtSingleton(target, position, parent);
+    }
+
+    private GameObject renderBlockWithPositionWithParentAtSingleton(GameObject target, Vector2 position, GameObject parent)
+    {
+        GameObject ret = Instantiate(target);
+        ret.transform.SetParent(parent.transform, false);
+        UnityUtils.moveUIElementToPosition(ret, position);
+        return ret;
+    }
+
     public static GameObject renderText() {
         return getInstance().renderTextSomewhere();
     }

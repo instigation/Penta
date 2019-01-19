@@ -71,6 +71,10 @@ public static class Utils {
         public Coordinate leftMost() {
             return new Coordinate(min.x, (min.y + max.y) / 2);
         }
+        public Coordinate leftTop()
+        {
+            return new Coordinate(min.x, max.y);
+        }
         public int getWidth() {
             return max.x - min.x + 1;
         }
@@ -96,6 +100,13 @@ public static class Utils {
     public static void centerToOrigin(List<Coordinate> set) {
         Envelope envelope = new Envelope(set);
         Coordinate center = envelope.center();
+        for (int i = 0; i < set.Count; i++)
+            set[i] -= center;
+    }
+    public static void leftTopToOrigin(List<Coordinate> set)
+    {
+        Envelope envelope = new Envelope(set);
+        Coordinate center = envelope.leftTop();
         for (int i = 0; i < set.Count; i++)
             set[i] -= center;
     }

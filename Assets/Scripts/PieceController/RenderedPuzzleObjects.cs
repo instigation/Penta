@@ -33,6 +33,7 @@ public class StructuredPiece {
         Utils.leftMostToOrigin(coors);
         return getOriginPosition();
     }
+    // origin means (0,0) in coordinate
     public Vector3 getOriginPosition() {
         Vector3 defalutPosition = UnityUtils.getPositionOfUIElement(blocks[0]);
         float x = defalutPosition.x, y = defalutPosition.y;
@@ -44,15 +45,15 @@ public class StructuredPiece {
         }
         return new Vector3(x, y);
     }
-    public void rotateClockWiseAQuarterWithOriginPosition(Vector3 originPosition) {
+    public void rotateClockWiseAQuarterWithPivotPosition(Vector3 pivotPosition) {
         Utils.rotateSetForTimes(coors, 1);
-        rotateGameObjectsWithOriginPosition(originPosition);
+        rotateGameObjectsWithPivotPosition(pivotPosition);
     }
-    private void rotateGameObjectsWithOriginPosition(Vector3 originPosition) {
+    private void rotateGameObjectsWithPivotPosition(Vector3 pivotPosition) {
         foreach (GameObject block in blocks) {
             Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
-            Vector3 distance = blockPosition - originPosition;
-            Vector3 newPosition = originPosition + UnityUtils.rotateClockwiseAQuater(distance);
+            Vector3 distance = blockPosition - pivotPosition;
+            Vector3 newPosition = pivotPosition + UnityUtils.rotateClockwiseAQuater(distance);
             UnityUtils.moveUIElementToPosition(block, newPosition);
         }
     }
@@ -80,19 +81,30 @@ public class StructuredPiece {
         foreach (GameObject block in blocks)
             UnityUtils.moveUIElementForDistance(block, distance);
     }
+    public void scale(float factor)
+    {
+        Vector3 pivotPosition = getOriginPosition();
+        foreach (GameObject block in blocks)
+        {
+            Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
+            UnityUtils.moveUIElementToPosition(block, pivotPosition + factor*(blockPosition - pivotPosition));
+            UnityUtils.scaleSizeOfUIElement(block, factor);
+        }
+    }
 }
 
 public class RenderedPiece : StructuredPiece{
     private Vector3 centerOriginalPosition;
+    // The renderedPiece is either candidate size or boardFit size.
+    private bool isCandidateSize = true;
+    private readonly float candidateBoardBlockSizeRatio = 2.0f;
 
     public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) 
         :base(rBlocks, blocks) {
         centerOriginalPosition = centerPosition();
     }
     public void rotate() {
-        Vector3 origin;
-        origin = centerPosition();
-        rotateClockWiseAQuarterWithOriginPosition(origin);
+        rotateClockWiseAQuarterWithPivotPosition(centerPosition());
     }
     public void reset() {
         Vector3 currentOriginPosition = centerPosition();
@@ -100,6 +112,8 @@ public class RenderedPiece : StructuredPiece{
     }
     public bool includes(Vector3 point) {
         List<Vector3> blocks = getBlockPositions();
+        Debug.Log("includes");
+        Debug.Log(blocks[0]);
         float sideLength = blockSize();
         foreach(Vector3 block in blocks) {
             var square = new UnityUtils.Square(block, sideLength);
@@ -109,8 +123,14 @@ public class RenderedPiece : StructuredPiece{
         return false;
     }
     public bool includesInNeighborhood(Vector3 point, float padding) {
+        // If padding=0, the neighborhood means the envelope covering the piece.
+        // {neighborhood width} = {envelope width} + 2*padding
+        // (similar for height)
         List<Vector3> blocks = getBlockPositions();
+        Debug.Log("includesInNeighborhood");
+        Debug.Log(blocks[0]);
         float sideLength = blockSize();
+        Debug.Log(sideLength);
         float left=100000, right=-100000, top=-100000, bottom=100000;
         foreach (Vector3 block in blocks) {
             float x = block.x;
@@ -124,13 +144,29 @@ public class RenderedPiece : StructuredPiece{
             if (y < bottom)
                 bottom = y;
         }
-        var rect = new UnityUtils.Rectangle(new Vector3((left+right)/2, (top+bottom)/2, 0), right-left+2*padding, top-bottom+2*padding);
+        var rect = new UnityUtils.Rectangle(new Vector3((left+right)/2, (top+bottom)/2, 0), right-left+sideLength+2*padding, top-bottom+sideLength+2*padding);
         return rect.includes(point);
 
     }
     public void destroy() {
         foreach(GameObject block in blocks) {
             Object.Destroy(block);
+        }
+    }
+    public void setToCandidateSize()
+    {
+        if (!isCandidateSize)
+        {
+            scale(1 / candidateBoardBlockSizeRatio);
+            isCandidateSize = true;
+        }
+    }
+    public void setToBoardFitSize()
+    {
+        if (isCandidateSize)
+        {
+            scale(candidateBoardBlockSizeRatio);
+            isCandidateSize = false;
         }
     }
 }

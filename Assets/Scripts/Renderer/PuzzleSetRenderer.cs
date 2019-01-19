@@ -6,15 +6,18 @@ public class PuzzleSetRenderer : MonoBehaviour {
     /// blocks나 boundary는 Unity editor에서 편하게 할당하기 위해 public으로 했지만
     /// 코드에서는 쓰지 않기 위해 python처럼 이름 앞에 __를 붙이고 쓰지 않기로 약속함.
     /// </summary>
+    public GameObject __canvas;
     public GameObject __boardBlock;
     public GameObject __boardBlockBackground;
     public GameObject[] __pieceBlocks;
     public float __gapPerBlockSize;
     public GameObject __centerOfBoard;
-    public GameObject __candidateLeftMostBlockSpawnPoint;
-    public float __gapBtwBlocks;
-    public bool __randomizeRotation = false;
-    private Vector3 spawnPosition;
+    public GameObject __candidateLeftTopBlockSpawnPoint;
+    // piece box means The 4x4 box covering the piece. 
+    // It is always 4x4 because the envelope of the piece could be 4x2,3x3,2x4.
+    public float __gapBtwPieceBoxes;
+    private readonly bool __randomizeRotation = false;
+    private Vector3 spawnOriginPosition;
 
     public RenderedPuzzleSet render(Puzzle p) {
         ///<summary>
@@ -31,42 +34,52 @@ public class PuzzleSetRenderer : MonoBehaviour {
         // 여기서 deep copy된 걸로 받아야 함.
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
         List<RenderedPiece> ret = new List<RenderedPiece>();
-        spawnPosition = UnityUtils.getPositionOfUIElement(__candidateLeftMostBlockSpawnPoint);
+        spawnOriginPosition = UnityUtils.getPositionOfUIElement(__candidateLeftTopBlockSpawnPoint);
         for (int i = 0; i < piecesInCoordinate.Count; i++) {
             List<Coordinate> pieceInCoordinate = piecesInCoordinate[i];
             if (__randomizeRotation)
                 Utils.rotateRandomlySavingWidth(pieceInCoordinate);
-            Utils.leftMostToOrigin(pieceInCoordinate);
-            PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __gapPerBlockSize);
-            RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnPosition);
-            setSpawnPositionBasedOn(renderedPiece);
+            Utils.leftTopToOrigin(pieceInCoordinate);
+            PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __candidateLeftTopBlockSpawnPoint, __gapPerBlockSize);
+            RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnOriginPosition);
+            if (i == 2)
+            {
+                spawnOriginPosition.y -= 4 * UnityUtils.getWidthOfUIElement(__pieceBlocks[0]) + __gapBtwPieceBoxes;
+                spawnOriginPosition.x = UnityUtils.getPositionOfUIElement(__candidateLeftTopBlockSpawnPoint).x;
+            }
+            else
+            {
+                spawnOriginPosition.x += 4 * UnityUtils.getWidthOfUIElement(__pieceBlocks[0]) + __gapBtwPieceBoxes;
+            }
             ret.Add(renderedPiece);
         }
         return ret;
     }
     private void setSpawnPositionBasedOn(RenderedPiece renderedPiece) {
-        spawnPosition.x = renderedPiece.getRightMostXPosition() + __gapBtwBlocks + renderedPiece.blockSize();
+        spawnOriginPosition.x = renderedPiece.getRightMostXPosition() + __gapBtwPieceBoxes + renderedPiece.blockSize();
     }
     private RenderedPuzzle renderPuzzle(Puzzle p) {
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
         Utils.centerToOrigin(piecesInCoordinate);
-        PuzzleRenderer renderer = new PuzzleRenderer(__boardBlock, __boardBlockBackground, __pieceBlocks, __gapPerBlockSize);
-        RenderedPuzzle ret = renderer.render(piecesInCoordinate, __centerOfBoard);
+        PuzzleRenderer renderer = new PuzzleRenderer(__boardBlock, __boardBlockBackground, __pieceBlocks, __centerOfBoard, __gapPerBlockSize);
+        RenderedPuzzle ret = renderer.render(piecesInCoordinate, UnityUtils.getPositionOfUIElement(__centerOfBoard));
         return ret;
     }
 }
 
-public class PieceRenderer {
+public class PieceRenderer{
     private GameObject pieceBlock;
     private float gapPerBlockSize;
     private Vector3 leftMostPosition;
+    private GameObject spawnPoint;
 
-    public PieceRenderer(GameObject pieceBlock, float gapPerBlockSize) {
+    public PieceRenderer(GameObject pieceBlock, GameObject spawnPoint, float gapPerBlockSize) {
         this.pieceBlock = pieceBlock;
+        this.spawnPoint = spawnPoint;
         this.gapPerBlockSize = gapPerBlockSize;
     }
-    public RenderedPiece render(List<Coordinate> blocks, Vector3 leftMostPosition) {
-        return renderBlocksAtOrigin(blocks, leftMostPosition);
+    public RenderedPiece render(List<Coordinate> blocks, Vector3 originPosition) {
+        return renderBlocksAtOrigin(blocks, originPosition);
     }
     private RenderedPiece renderBlocksAtOrigin(List<Coordinate> blocks, Vector3 originPosition) {
         ///<remarks>
@@ -84,27 +97,29 @@ public class PieceRenderer {
     private float blockSize() {
         return UnityUtils.getWidthOfUIElement(pieceBlock);
     }
-    private GameObject renderOneBlockAt(Vector3 position) {
+    private GameObject renderOneBlockAt(Vector3 position)
+    {
         return MonoBehaviourUtils.renderBlockWithPosition(pieceBlock, position);
     }
 }
 
-public class PuzzleRenderer {
+public class PuzzleRenderer{
     private GameObject boardBlock;
     private GameObject boardBlockBackground;
     private GameObject[] pieceBlocks;
     private float gapPerBlockSize;
+    private GameObject spawnPoint;
 
     public PuzzleRenderer(GameObject boardBlock, GameObject boardBlockBackground,
-        GameObject[] pieceBlocks, float gapPerBlockSize) {
+        GameObject[] pieceBlocks, GameObject spawnPoint, float gapPerBlockSize) {
         this.boardBlock = boardBlock;
         this.boardBlockBackground = boardBlockBackground;
         this.pieceBlocks = pieceBlocks;
+        this.spawnPoint = spawnPoint;
         this.gapPerBlockSize = gapPerBlockSize;
     }
-    public RenderedPuzzle render(List<List<Coordinate>> pieces, GameObject centerOfBoard) {
+    public RenderedPuzzle render(List<List<Coordinate>> pieces, Vector3 centerPosition) {
         float distance = blockSize() * (1 + gapPerBlockSize);
-        Vector3 centerPosition = UnityUtils.getPositionOfUIElement(centerOfBoard);
         List<List<GameObject>> background = renderBlocks(pieces, centerPosition, distance, boardBlockBackground);
         List<List<GameObject>> board = renderBlocks(pieces, centerPosition, distance, boardBlock);
         return new RenderedPuzzle(board, background);

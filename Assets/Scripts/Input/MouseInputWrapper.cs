@@ -19,15 +19,13 @@ public class MouseInputWrapper : GeneralInput {
     private enum state { BEGAN, MOVED, ENDED, IDLE };
     private state current = state.IDLE;
     private Vector3 mousePosition;
-    private float canvasWidth;
-    private float canvasHeight;
+    private GameObject canvas;
     private InputValidator validator;
     private int lastTouchedFrame;
     private float deltaTouchTime;
 
-    public MouseInputWrapper(float canvasWidth, float canvasHeight, InputValidator validator) {
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
+    public MouseInputWrapper(GameObject canvas, InputValidator validator) {
+        this.canvas = canvas;
         this.validator = validator;
         this.lastTouchedFrame = -1000;
     }
@@ -37,7 +35,9 @@ public class MouseInputWrapper : GeneralInput {
     private void stateTransition() {
         if (current == state.IDLE) {
             mousePosition = position();
-            if (Input.GetMouseButtonDown(0) && validator.isValid(mousePosition)) {
+            if(Input.GetMouseButtonDown(0))
+                Debug.Log(mousePosition);
+            if (Input.GetMouseButtonDown(0)) {
                 current = state.BEGAN;
                 int currentTouchedFrame = Time.frameCount;
                 deltaTouchTime = (currentTouchedFrame - lastTouchedFrame)*Time.deltaTime;
@@ -48,7 +48,7 @@ public class MouseInputWrapper : GeneralInput {
             current = state.MOVED;
         }
         else if (current == state.MOVED) {
-            if (Input.GetMouseButtonUp(0) && validator.isValid(mousePosition))
+            if (Input.GetMouseButtonUp(0))
                 current = state.ENDED;
         }
         else if (current == state.ENDED) {
@@ -68,10 +68,11 @@ public class MouseInputWrapper : GeneralInput {
         return current == state.ENDED;
     }
     public Vector3 position() {
-        Vector3 mousePos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        mousePos -= new Vector3(0.5f, 0.5f, 0.0f);
-        mousePos.x *= canvasWidth;
-        mousePos.y *= canvasHeight;
+        //Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //mousePos.x *= canvasWidth;
+        //mousePos.y *= canvasHeight;
+        Vector2 mousePos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.GetComponent<RectTransform>(), Input.mousePosition, null, out mousePos);
         return mousePos;
     }
     public Vector3 deltaPosition() {

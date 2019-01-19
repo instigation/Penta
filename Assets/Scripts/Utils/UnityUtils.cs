@@ -18,6 +18,11 @@ public static class UnityUtils{
         return target.GetComponent<RectTransform>().rect.width;
     }
 
+    public static void makeSquareAtOrigin(GameObject target, float sideLength)
+    {
+        target.GetComponent<RectTransform>().rect.Set(0, 0, sideLength, sideLength);
+    }
+
     public static List<Vector3> getPositionsOfUIElements(List<GameObject> targets) {
         List<Vector3> ret = new List<Vector3>();
         foreach (GameObject target in targets)
@@ -30,6 +35,11 @@ public static class UnityUtils{
 
     public static Vector3 rotateClockwiseAQuater(Vector3 vector) {
         return new Vector3(vector.y, -vector.x);
+    }
+
+    public static void scaleSizeOfUIElement(GameObject target, float factor)
+    {
+        target.GetComponent<RectTransform>().localScale *= factor;
     }
 
     public class Square {
