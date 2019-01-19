@@ -78,8 +78,10 @@ public class PieceController : MonoBehaviour{
         if (selected != NONE)
         {
             RenderedPiece selectedPiece = candidates[selected];
-            board.highlightFittingCandidates(selectedPiece.getBlockPositions());
+            board.highlightClosestBlocks(selectedPiece.getBlockPositions());
         }
+        else
+            board.resetBlockColors();
 
     }
     private void resetSelected() {

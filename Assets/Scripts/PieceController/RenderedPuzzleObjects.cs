@@ -254,11 +254,8 @@ public class RenderedPuzzle {
         public bool fits() { return isTargetFits; }
         public bool isCovered() { return isTargetCovered; }
         public Vector3 getDelta() { return isTargetFits? delta : new Vector3(0, 0); }
-        public List<Coordinate> getFittedIndexes() {
-            if(fits())
-                return fittedIndexes;
-            else
-                return new List<Coordinate>();
+        public List<Coordinate> getPartiallyFittedIndexes() {
+            return fittedIndexes;
         }
         public List<Coordinate> getCoveredIndexes() {
             if (isCovered())
@@ -268,12 +265,11 @@ public class RenderedPuzzle {
         }
     }
 
-    public void highlightFittingCandidates(List<Vector3> blockPositions)
+    public void highlightClosestBlocks(List<Vector3> blockPositions)
     {
         Comparer comp = new Comparer(board, isOccupied, blockPositions);
         resetBlockColors();
-        if (comp.fits())
-            highlightBlocksAt(comp.getFittedIndexes());
+        highlightBlocksAt(comp.getPartiallyFittedIndexes());
     }
     private void highlightBlocksAt(List<Coordinate> indexes)
     {
@@ -282,7 +278,7 @@ public class RenderedPuzzle {
             board[index.x][index.y].GetComponent<Image>().color = Color.green;
         }
     }
-    private void resetBlockColors()
+    public void resetBlockColors()
     {
         foreach(List<GameObject> blockList in board)
         {
@@ -296,7 +292,7 @@ public class RenderedPuzzle {
     public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
         Comparer comp = new Comparer(board, isOccupied, blockPositions);
         if (comp.fits()) {
-            occupyBlocksAt(comp.getFittedIndexes());
+            occupyBlocksAt(comp.getPartiallyFittedIndexes());
             recentInsertionSuccess = true;
         }
         else
