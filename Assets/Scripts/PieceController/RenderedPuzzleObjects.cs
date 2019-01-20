@@ -75,6 +75,7 @@ public class StructuredPiece {
         return maxXPos;
     }
     public float blockSize() {
+        // assumes the block to be square
         return UnityUtils.getWidthOfUIElement(blocks[0]);
     }
     public void moveFor(Vector3 distance) {

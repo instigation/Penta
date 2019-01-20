@@ -7,6 +7,8 @@ public class PuzzleStageController : MonoBehaviour {
     public Vector3 canvasPosition;
     public ScoreChanger __scoreChanger;
     public GameObject __workingArea;
+    public Timer __timer;
+    public ProgressBar __progressBar;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
@@ -54,6 +56,7 @@ public class PuzzleStageController : MonoBehaviour {
         if(!input.noTouching()) {
             //only process the first touch
             if (input.touchBegan()) {
+                __progressBar.progressByOne();
                 Debug.Log("touch began!");
                 __controller.selectOnPosition(input.position(), __renderer.__gapBtwPieceBoxes/2);
                 __controller.tryToExtractSelected();

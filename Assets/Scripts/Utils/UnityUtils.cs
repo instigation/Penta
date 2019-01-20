@@ -15,7 +15,8 @@ public static class UnityUtils{
     }
 
     public static float getWidthOfUIElement(GameObject target) {
-        return target.GetComponent<RectTransform>().rect.width;
+        float scaleFactor = target.GetComponent<RectTransform>().localScale.x;
+        return target.GetComponent<RectTransform>().rect.width * scaleFactor;
     }
 
     public static void makeSquareAtOrigin(GameObject target, float sideLength)
