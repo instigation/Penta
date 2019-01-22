@@ -62,8 +62,10 @@ public class PieceController : MonoBehaviour{
     public void unSelect() {
         selected = NONE;
     }
-    public void tryToInsertSelected() {
-        if(selected != NONE) {
+    public bool tryToInsertSelected() {
+        // postcondition: return false iff it wasn't insertion attempt. That is, iff there is no selected.
+        if (selected != NONE)
+        {
             RenderedPiece selectedPiece = candidates[selected];
             Vector3 delta = board.tryToInsertAndReturnDelta(selectedPiece.getBlockPositions());
             if (!board.getRecentInsertionSuccess())
@@ -71,7 +73,9 @@ public class PieceController : MonoBehaviour{
             else
                 isInserted[selected] = true;
             moveSelectedFor(delta);
+            return true;
         }
+        else return false;
     }
     public void highlightBoardBySelected()
     {
@@ -97,6 +101,10 @@ public class PieceController : MonoBehaviour{
             bool extractionSuccess = board.tryToExtract(selectedPiece.getBlockPositions());
             if (extractionSuccess)
                 isInserted[selected] = false;
+            else
+            {
+                unSelect();
+            }
         }
     }
 }

@@ -72,15 +72,17 @@ public class PuzzleStageController : MonoBehaviour {
             }
             else if (input.touchEnded()) {
                 Debug.Log("touch ended!");
-                __controller.tryToInsertSelected();
+                if (__controller.tryToInsertSelected())
+                {
+                    float currentStageTime = __timer.getCurrentStageTime();
+                    InsertionResult insertionResult = puzzleSet.board.lastInsertionResult();
+                    bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
+                    addTime(bonusCalculator.getBonusTime());
+                    addScore(bonusCalculator.getBonusScore());
+                    if (puzzleSet.board.isSolved())
+                        clearStage();
+                }
                 __controller.unSelect();
-                float currentStageTime = __timer.getCurrentStageTime();
-                InsertionResult insertionResult = puzzleSet.board.lastInsertionResult();
-                bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
-                addTime(bonusCalculator.getBonusTime());
-                addScore(bonusCalculator.getBonusScore());
-                if (puzzleSet.board.isSolved())
-                    clearStage();
             }
             __controller.highlightBoardBySelected();
         }

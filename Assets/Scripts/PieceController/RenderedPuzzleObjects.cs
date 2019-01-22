@@ -305,6 +305,7 @@ public class RenderedPuzzle {
             isOccupied[index.x][index.y] = true;
     }
     public bool tryToExtract(List<Vector3> blockPositions) {
+        // postcondition: extract fail iff the piece is in the correct position
         List<List<bool>> isNotOccupied = new List<List<bool>>();
         foreach(List<bool> subList in isOccupied)
         {
@@ -316,11 +317,18 @@ public class RenderedPuzzle {
         BoardComparer comp = new BoardComparer(board, isNotOccupied, blockPositions);
         if (comp.fits())
         {
-            releaseBlocksAt(comp.getPartiallyFittedIndexes());
-            return true;
+            if (Utils.isXConsistent(comp.getPartiallyFittedIndexes()))
+            {
+                return false;
+            }
+            else
+            {
+                releaseBlocksAt(comp.getPartiallyFittedIndexes());
+                return true;
+            }
         }
         else
-            return false;
+            return true;
     }
     private void releaseBlocksAt(List<Coordinate> indexes) {
         foreach (Coordinate index in indexes)
