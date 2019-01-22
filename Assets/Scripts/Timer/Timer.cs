@@ -50,6 +50,11 @@ public class Timer : MonoBehaviour
         yield return null;
     }
 
+    public float getCurrentStageTime()
+    {
+        return Time.fixedTime;
+    }
+
     private void changeTime(float deltaTimeInSecond)
     {
         timeSlider.value += deltaTimeInSecond / maxTimeInSecond;

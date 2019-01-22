@@ -138,4 +138,20 @@ public static class Utils {
             set[i] = result + center;
         }
     }
+    public static bool isXConsistent(List<Coordinate> set)
+    {
+
+        if (set.Count == 0)
+            return true;
+        else
+        {
+            int x = set[0].x;
+            foreach(Coordinate elem in set)
+            {
+                if (elem.x != x)
+                    return false;
+            }
+        }
+        return true;
+    }
 }

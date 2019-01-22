@@ -48,6 +48,10 @@ public class ProgressBar : MonoBehaviour
             advanceSubStage();
         }
     }
+    public int getStage()
+    {
+        return stage;
+    }
     private void advanceStage()
     {
         stage++;

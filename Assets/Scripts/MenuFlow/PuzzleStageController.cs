@@ -12,12 +12,14 @@ public class PuzzleStageController : MonoBehaviour {
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
+    private BonusCalculator bonusCalculator;
 
     // Use this for initialization
     void Start () {
         renderPuzzle();
         renderAd();
         setInput();
+        setBonusCalculator();
     }
     private void setAndroidLogger() {
         logger = new AndroidLogger();
@@ -49,6 +51,10 @@ public class PuzzleStageController : MonoBehaviour {
         InputValidator workingspaceValidator = new WorkingspaceValidator(__workingArea);
         input = new MouseInputWrapper(__canvas, workingspaceValidator);
     }
+    private void setBonusCalculator()
+    {
+        bonusCalculator = new BonusCalculator(__progressBar);
+    }
 
     // Update is called once per frame
     void Update () {
@@ -56,7 +62,6 @@ public class PuzzleStageController : MonoBehaviour {
         if(!input.noTouching()) {
             //only process the first touch
             if (input.touchBegan()) {
-                __progressBar.progressByOne();
                 Debug.Log("touch began!");
                 __controller.selectOnPosition(input.position(), __renderer.__gapBtwPieceBoxes/2);
                 __controller.tryToExtractSelected();
@@ -69,12 +74,80 @@ public class PuzzleStageController : MonoBehaviour {
                 Debug.Log("touch ended!");
                 __controller.tryToInsertSelected();
                 __controller.unSelect();
+                float currentStageTime = __timer.getCurrentStageTime();
+                InsertionResult insertionResult = puzzleSet.board.lastInsertionResult();
+                bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
+                addTime(bonusCalculator.getBonusTime());
+                addScore(bonusCalculator.getBonusScore());
                 if (puzzleSet.board.isSolved())
                     clearStage();
             }
             __controller.highlightBoardBySelected();
         }
     }
+
+    private class BonusCalculator
+    {
+        private float lastCorrectInsertionTime;
+        private bool isLastInsertionCorrect;
+        private bool isStreakOccured;
+        private bool isCorrectInsertionOccured;
+        private int streak;
+        private int combo;
+        private ProgressBar progressBar;
+
+        public BonusCalculator(ProgressBar progressBar)
+        {
+            isLastInsertionCorrect = false;
+            lastCorrectInsertionTime = float.NegativeInfinity;
+            isStreakOccured = false;
+            isCorrectInsertionOccured = false;
+            streak = 0;
+            combo = 0;
+            this.progressBar = progressBar;
+        }
+        public void calculateOnInsertion(InsertionResult insertionResult, float currentStageTime)
+        {
+            switch (insertionResult)
+                {
+                case InsertionResult.CORRECT:
+                    isCorrectInsertionOccured = true;
+                    if (isLastInsertionCorrect)
+                    {
+                        streak++;
+                        isStreakOccured = true;
+                    }
+                    else
+                        isStreakOccured = false;
+                    if (currentStageTime - lastCorrectInsertionTime <= 2.0f)
+                        combo++;
+                    else
+                        combo = 0;
+                    isLastInsertionCorrect = true;
+                    lastCorrectInsertionTime = currentStageTime;
+                    break;
+                case InsertionResult.WRONG:
+                    isCorrectInsertionOccured = false;
+                    streak = 0;
+                    isStreakOccured = false;
+                    isLastInsertionCorrect = false;
+                    break;
+                case InsertionResult.MISS:
+                    isCorrectInsertionOccured = false;
+                    isStreakOccured = false;
+                    break;
+            }
+        }
+        public float getBonusTime()
+        {
+            return isStreakOccured ? 1 : 0;
+        }
+        public int getBonusScore()
+        {
+            return isCorrectInsertionOccured? progressBar.getStage()*(combo + streak + 1) : 0;
+        }
+    }
+
     private void clearStage() {
         clearPuzzle();
         addScore(50);
@@ -82,6 +155,10 @@ public class PuzzleStageController : MonoBehaviour {
     }
     private void addScore(int amount) {
         StartCoroutine(__scoreChanger.changeGradually(amount));
+    }
+    private void addTime(float amount)
+    {
+        StartCoroutine(__timer.manuallyChangeTime(amount));
     }
     private void clearPuzzle() {
         puzzleSet.destroy();

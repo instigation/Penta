@@ -111,6 +111,7 @@ public class Puzzle {
         pieces = ppieces;
     }
     public int size() { return pieces.Count; }
+    // postcondition: List of List of blocks = List of pieces
     public List<List<Coordinate>> getBlocks() {
         List<List<Coordinate>> ret = new List<List<Coordinate>>();
         foreach(PlacedPiece piece in pieces) {

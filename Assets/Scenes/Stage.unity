@@ -656,7 +656,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.331
+  m_Value: 0.893
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1484,7 +1484,7 @@ RectTransform:
   m_GameObject: {fileID: 1554361747}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.51296294, y: 0.51296294, z: 0.51296294}
+  m_LocalScale: {x: 0.43703705, y: 0.43703705, z: 0.43703705}
   m_Children:
   - {fileID: 346060305}
   - {fileID: 980444480}
@@ -1503,7 +1503,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 277, y: 488}
+  m_AnchoredPosition: {x: 236, y: 488}
   m_SizeDelta: {x: 1080, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1554361752

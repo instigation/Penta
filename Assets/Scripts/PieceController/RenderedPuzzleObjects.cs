@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum InsertionResult { CORRECT, WRONG, MISS }
+
 public class RenderedPuzzleSet {
     public List<RenderedPiece> candidates;
     public RenderedPuzzle board;
@@ -180,7 +182,9 @@ public class RenderedPuzzle {
     private Color originalBoardColor;
     private const float rangePerHalfBlockSize = 0.9999f;
     private bool recentInsertionSuccess;
+    private InsertionResult recentInsertionResult;
 
+    // precondition: board is aligned as List of pieces. That is, List of List of GameObject = List of pieces.
     public RenderedPuzzle(List<List<GameObject>> board, List<List<GameObject>> background) {
         this.board = board;
         this.background = background;
@@ -200,31 +204,27 @@ public class RenderedPuzzle {
         }
     }
 
-    private class Comparer {
+    private class BoardComparer {
         // TODO: readonly로 바꾸기
         private List<List<GameObject>> board;
-        private List<List<bool>> covered;
+        private List<List<bool>> isInvalid;
         private List<Vector3> target;
         private bool isTargetFits;
-        private bool isTargetCovered;
         // Tuple이 없어서 대신 Coordinate를 사용함
         private List<Coordinate> fittedIndexes;
-        private List<Coordinate> coveredIndexes;
         private Vector3 delta;
         
-        public Comparer(List<List<GameObject>> board, List<List<bool>> covered, List<Vector3> target) {
+        public BoardComparer(List<List<GameObject>> board, List<List<bool>> isInvalid, List<Vector3> target) {
             this.board = board;
-            this.covered = covered;
+            this.isInvalid = isInvalid;
             this.target = target;
             fittedIndexes = new List<Coordinate>();
-            coveredIndexes = new List<Coordinate>();
             compare();
         }
         private void compare() {
             isTargetFits = true;
-            isTargetCovered = true;
-            foreach(Vector3 block in target) {
-                compareOne(block);
+            foreach(Vector3 blockPosition in target) {
+                compareOne(blockPosition);
             }
         }
         private void compareOne(Vector3 blockPosition) {
@@ -235,40 +235,28 @@ public class RenderedPuzzle {
                     float range = (blockSize / 2) * rangePerHalfBlockSize;
                     var rangeSquare = new UnityUtils.Square(center, range * 2);
                     if (rangeSquare.includes(blockPosition)) {
-                        if (covered[i][j]) {
-                            coveredIndexes.Add(new Coordinate(i, j));
+                        if (isInvalid[i][j]) {
                             isTargetFits = false;
                             return;
                         }
                         else {
                             delta = center - blockPosition;
                             fittedIndexes.Add(new Coordinate(i, j));
-                            isTargetCovered = false;
                             return;
                         }
                     }
                 }
             }
             isTargetFits = false;
-            isTargetCovered = false;
         }
         public bool fits() { return isTargetFits; }
-        public bool isCovered() { return isTargetCovered; }
         public Vector3 getDelta() { return isTargetFits? delta : new Vector3(0, 0); }
-        public List<Coordinate> getPartiallyFittedIndexes() {
-            return fittedIndexes;
-        }
-        public List<Coordinate> getCoveredIndexes() {
-            if (isCovered())
-                return coveredIndexes;
-            else
-                return new List<Coordinate>();
-        }
+        public List<Coordinate> getPartiallyFittedIndexes() { return fittedIndexes; }
     }
 
     public void highlightClosestBlocks(List<Vector3> blockPositions)
     {
-        Comparer comp = new Comparer(board, isOccupied, blockPositions);
+        BoardComparer comp = new BoardComparer(board, isOccupied, blockPositions);
         resetBlockColors();
         highlightBlocksAt(comp.getPartiallyFittedIndexes());
     }
@@ -291,13 +279,25 @@ public class RenderedPuzzle {
     }
 
     public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
-        Comparer comp = new Comparer(board, isOccupied, blockPositions);
+        BoardComparer comp = new BoardComparer(board, isOccupied, blockPositions);
         if (comp.fits()) {
-            occupyBlocksAt(comp.getPartiallyFittedIndexes());
+            List<Coordinate> partiallyFittedIndexes = comp.getPartiallyFittedIndexes();
+            occupyBlocksAt(partiallyFittedIndexes);
             recentInsertionSuccess = true;
+            if (Utils.isXConsistent(partiallyFittedIndexes))
+            {
+                recentInsertionResult = InsertionResult.CORRECT;
+            }
+            else
+            {
+                recentInsertionResult = InsertionResult.WRONG;
+            }
         }
         else
+        {
+            recentInsertionResult = InsertionResult.MISS;
             recentInsertionSuccess = false;
+        }
         return comp.getDelta();
     }
     private void occupyBlocksAt(List<Coordinate> indexes) {
@@ -305,10 +305,18 @@ public class RenderedPuzzle {
             isOccupied[index.x][index.y] = true;
     }
     public bool tryToExtract(List<Vector3> blockPositions) {
-        Comparer comp = new Comparer(board, isOccupied, blockPositions);
-        if (comp.isCovered())
+        List<List<bool>> isNotOccupied = new List<List<bool>>();
+        foreach(List<bool> subList in isOccupied)
         {
-            releaseBlocksAt(comp.getCoveredIndexes());
+            List<bool> newList = new List<bool>();
+            foreach (bool isBlockOccupied in subList)
+                newList.Add(!isBlockOccupied);
+            isNotOccupied.Add(newList);
+        }
+        BoardComparer comp = new BoardComparer(board, isNotOccupied, blockPositions);
+        if (comp.fits())
+        {
+            releaseBlocksAt(comp.getPartiallyFittedIndexes());
             return true;
         }
         else
@@ -349,5 +357,9 @@ public class RenderedPuzzle {
     }
     public bool getRecentInsertionSuccess() {
         return recentInsertionSuccess;
+    }
+    public InsertionResult lastInsertionResult()
+    {
+        return recentInsertionResult;
     }
 }
