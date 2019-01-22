@@ -75,6 +75,10 @@ public static class Utils {
         {
             return new Coordinate(min.x, max.y);
         }
+        public Coordinate centerTop()
+        {
+            return new Coordinate((min.x + max.x) / 2, max.y);
+        }
         public int getWidth() {
             return max.x - min.x + 1;
         }
@@ -96,6 +100,10 @@ public static class Utils {
             mergedSet.AddRange(sub);
         }
         return (new Envelope(mergedSet)).center();
+    }
+    public static Coordinate centerTopOfEnvelope(List<Coordinate> set)
+    {
+        return (new Envelope(set)).centerTop();
     }
     public static void centerToOrigin(List<Coordinate> set) {
         Envelope envelope = new Envelope(set);

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class PuzzleStageController : MonoBehaviour {
     public PuzzleSetRenderer __renderer;
@@ -9,6 +10,7 @@ public class PuzzleStageController : MonoBehaviour {
     public GameObject __workingArea;
     public Timer __timer;
     public ProgressBar __progressBar;
+    public GameObject __bonusText;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
@@ -53,7 +55,7 @@ public class PuzzleStageController : MonoBehaviour {
     }
     private void setBonusCalculator()
     {
-        bonusCalculator = new BonusCalculator(__progressBar);
+        bonusCalculator = new BonusCalculator(__progressBar, __bonusText, __canvas);
     }
 
     // Update is called once per frame
@@ -62,7 +64,6 @@ public class PuzzleStageController : MonoBehaviour {
         if(!input.noTouching()) {
             //only process the first touch
             if (input.touchBegan()) {
-                Debug.Log("touch began!");
                 __controller.selectOnPosition(input.position(), __renderer.__gapBtwPieceBoxes/2);
                 __controller.tryToExtractSelected();
                 __controller.moveSelectedTo(input.position());
@@ -71,7 +72,6 @@ public class PuzzleStageController : MonoBehaviour {
                 __controller.moveSelectedFor(input.deltaPosition());
             }
             else if (input.touchEnded()) {
-                Debug.Log("touch ended!");
                 if (__controller.tryToInsertSelected())
                 {
                     float currentStageTime = __timer.getCurrentStageTime();
@@ -79,6 +79,7 @@ public class PuzzleStageController : MonoBehaviour {
                     bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
                     addTime(bonusCalculator.getBonusTime());
                     addScore(bonusCalculator.getBonusScore());
+                    bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedPosition());
                     if (puzzleSet.board.isSolved())
                         clearStage();
                 }
@@ -97,8 +98,10 @@ public class PuzzleStageController : MonoBehaviour {
         private int streak;
         private int combo;
         private ProgressBar progressBar;
+        private GameObject bonusText;
+        private GameObject canvas;
 
-        public BonusCalculator(ProgressBar progressBar)
+        public BonusCalculator(ProgressBar progressBar, GameObject bonusText, GameObject canvas)
         {
             isLastInsertionCorrect = false;
             lastCorrectInsertionTime = float.NegativeInfinity;
@@ -107,6 +110,8 @@ public class PuzzleStageController : MonoBehaviour {
             streak = 0;
             combo = 0;
             this.progressBar = progressBar;
+            this.bonusText = bonusText;
+            this.canvas = canvas;
         }
         public void calculateOnInsertion(InsertionResult insertionResult, float currentStageTime)
         {
@@ -147,6 +152,25 @@ public class PuzzleStageController : MonoBehaviour {
         public int getBonusScore()
         {
             return isCorrectInsertionOccured? progressBar.getStage()*(combo + streak + 1) : 0;
+        }
+        public void playBonusText(Vector2 position)
+        {
+            if (isCorrectInsertionOccured)
+            {
+                GameObject ret = Instantiate(bonusText);
+                ret.transform.SetParent(canvas.transform, false);
+                UnityUtils.moveUIElementToPosition(ret, position);
+                ret.transform.GetChild(0).GetComponent<Text>().text = getBonusText();
+            }
+        }
+        private string getBonusText()
+        {
+            string ret = "\n+" + getBonusScore().ToString();
+            if (streak != 0)
+                ret = "\nSmart! x" + streak.ToString() + ret;
+            if (combo != 0)
+                ret = "Fast! x" + combo.ToString() + ret;
+            return ret;
         }
     }
 

@@ -1107,6 +1107,8 @@ MonoBehaviour:
   __workingArea: {fileID: 231757171}
   __timer: {fileID: 501147691}
   __progressBar: {fileID: 1134580930}
+  __bonusText: {fileID: 4078823601623609334, guid: 54968c886b9d1472e9e71da0eb84bf3a,
+    type: 3}
 --- !u!4 &991601166
 Transform:
   m_ObjectHideFlags: 0
@@ -1484,7 +1486,7 @@ RectTransform:
   m_GameObject: {fileID: 1554361747}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.43703705, y: 0.43703705, z: 0.43703705}
+  m_LocalScale: {x: 0.52962965, y: 0.52962965, z: 0.52962965}
   m_Children:
   - {fileID: 346060305}
   - {fileID: 980444480}
@@ -1503,7 +1505,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 236, y: 488}
+  m_AnchoredPosition: {x: 286, y: 491}
   m_SizeDelta: {x: 1080, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1554361752

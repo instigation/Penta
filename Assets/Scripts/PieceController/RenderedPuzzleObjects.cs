@@ -115,8 +115,6 @@ public class RenderedPiece : StructuredPiece{
     }
     public bool includes(Vector3 point) {
         List<Vector3> blocks = getBlockPositions();
-        Debug.Log("includes");
-        Debug.Log(blocks[0]);
         float sideLength = blockSize();
         foreach(Vector3 block in blocks) {
             var square = new UnityUtils.Square(block, sideLength);
@@ -130,10 +128,7 @@ public class RenderedPiece : StructuredPiece{
         // {neighborhood width} = {envelope width} + 2*padding
         // (similar for height)
         List<Vector3> blocks = getBlockPositions();
-        Debug.Log("includesInNeighborhood");
-        Debug.Log(blocks[0]);
         float sideLength = blockSize();
-        Debug.Log(sideLength);
         float left=100000, right=-100000, top=-100000, bottom=100000;
         foreach (Vector3 block in blocks) {
             float x = block.x;
@@ -177,12 +172,14 @@ public class RenderedPiece : StructuredPiece{
 public class RenderedPuzzle {
     private List<List<GameObject>> board;
     private List<List<GameObject>> background;
+    private int blinkHash = Animator.StringToHash("blink");
     private List<List<bool>> isOccupied;
     private List<List<bool>> isHighlighted;
     private Color originalBoardColor;
     private const float rangePerHalfBlockSize = 0.9999f;
     private bool recentInsertionSuccess;
     private InsertionResult recentInsertionResult;
+    private BoardComparer lastInsertionComparer;
 
     // precondition: board is aligned as List of pieces. That is, List of List of GameObject = List of pieces.
     public RenderedPuzzle(List<List<GameObject>> board, List<List<GameObject>> background) {
@@ -279,14 +276,15 @@ public class RenderedPuzzle {
     }
 
     public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
-        BoardComparer comp = new BoardComparer(board, isOccupied, blockPositions);
-        if (comp.fits()) {
-            List<Coordinate> partiallyFittedIndexes = comp.getPartiallyFittedIndexes();
+        lastInsertionComparer = new BoardComparer(board, isOccupied, blockPositions);
+        if (lastInsertionComparer.fits()) {
+            List<Coordinate> partiallyFittedIndexes = lastInsertionComparer.getPartiallyFittedIndexes();
             occupyBlocksAt(partiallyFittedIndexes);
             recentInsertionSuccess = true;
             if (Utils.isXConsistent(partiallyFittedIndexes))
             {
                 recentInsertionResult = InsertionResult.CORRECT;
+                playBlinking(partiallyFittedIndexes);
             }
             else
             {
@@ -298,7 +296,15 @@ public class RenderedPuzzle {
             recentInsertionResult = InsertionResult.MISS;
             recentInsertionSuccess = false;
         }
-        return comp.getDelta();
+        return lastInsertionComparer.getDelta();
+    }
+    private void playBlinking(List<Coordinate> blinkTargetCoordinates)
+    {
+        foreach(Coordinate coor in blinkTargetCoordinates)
+        {
+            GameObject blinkTarget = background[coor.x][coor.y];
+            blinkTarget.GetComponent<Animator>().SetTrigger("blink");
+        }
     }
     private void occupyBlocksAt(List<Coordinate> indexes) {
         foreach (Coordinate index in indexes)
@@ -369,5 +375,22 @@ public class RenderedPuzzle {
     public InsertionResult lastInsertionResult()
     {
         return recentInsertionResult;
+    }
+    public Vector2 topOfLastInsertedPosition()
+    {
+        List<Coordinate> fittedIndexes = lastInsertionComparer.getPartiallyFittedIndexes();
+        float max_x = float.NegativeInfinity, min_x = float.PositiveInfinity, max_y = float.NegativeInfinity;
+        foreach(Coordinate index in fittedIndexes)
+        {
+            Vector2 pos = UnityUtils.getPositionOfUIElement(board[index.x][index.y]);
+            Debug.Log(pos);
+            if (max_x < pos.x)
+                max_x = pos.x;
+            if (min_x > pos.x)
+                min_x = pos.x;
+            if (max_y < pos.y)
+                max_y = pos.y;
+        }
+        return new Vector2((min_x + max_x) / 2, max_y);
     }
 }

@@ -35,8 +35,6 @@ public class MouseInputWrapper : GeneralInput {
     private void stateTransition() {
         if (current == state.IDLE) {
             mousePosition = position();
-            if(Input.GetMouseButtonDown(0))
-                Debug.Log(mousePosition);
             if (Input.GetMouseButtonDown(0)) {
                 current = state.BEGAN;
                 int currentTouchedFrame = Time.frameCount;
