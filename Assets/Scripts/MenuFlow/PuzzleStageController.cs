@@ -11,17 +11,23 @@ public class PuzzleStageController : MonoBehaviour {
     public Timer __timer;
     public ProgressBar __progressBar;
     public GameObject __bonusText;
+    public StageChanger __stageChanger;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
     private BonusCalculator bonusCalculator;
+    private bool notEnabledYet = true;
 
     // Use this for initialization
     void Start () {
-        renderPuzzle();
-        renderAd();
         setInput();
         setBonusCalculator();
+    }
+    void OnEnable()
+    {
+        if (!notEnabledYet)
+            renderPuzzle();
+        notEnabledYet = false;
     }
     private void setAndroidLogger() {
         logger = new AndroidLogger();
@@ -50,7 +56,7 @@ public class PuzzleStageController : MonoBehaviour {
         BannerMaker.requestBanner();
     }
     private void setInput() {
-        InputValidator workingspaceValidator = new WorkingspaceValidator(__workingArea);
+        InputValidator workingspaceValidator = new EmptyValidator();
         input = new MouseInputWrapper(__canvas, workingspaceValidator);
     }
     private void setBonusCalculator()
@@ -176,8 +182,12 @@ public class PuzzleStageController : MonoBehaviour {
 
     private void clearStage() {
         clearPuzzle();
-        addScore(50);
-        renderPuzzle();
+        __progressBar.progressByOne();
+        if (__progressBar.isEnded())
+            __stageChanger.toStage(Stage.MENU);
+            // TODO: render skippable ad, revive, ...
+        else
+            renderPuzzle();
     }
     private void addScore(int amount) {
         StartCoroutine(__scoreChanger.changeGradually(amount));

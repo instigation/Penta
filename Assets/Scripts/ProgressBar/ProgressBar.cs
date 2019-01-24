@@ -27,11 +27,12 @@ public class ProgressBar : MonoBehaviour
         {
             stage = 1;
             GlobalInformation.storeKeyValue("stage", stage);
-            subStage = 1;
+            subStage = 0;
             GlobalInformation.storeKeyValue("subStage", subStage);
         }
         slider = gameObject.transform.GetChild(1);
         text = gameObject.transform.GetChild(2);
+        updateTextAndBar();
     }
     public bool isEnded()
     {
