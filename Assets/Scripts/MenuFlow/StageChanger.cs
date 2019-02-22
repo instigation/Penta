@@ -9,11 +9,13 @@ public class StageChanger : MonoBehaviour
     private Stage currentStage;
     private string[] correspondingTags = { "Menu", "PuzzleStage", "Setting", "Leaderboard" };
     public GameObject[][] gameObjects;
+    private AdMaker adMaker;
 
-    // Start is called before the first frame update
     void Awake()
     {
         currentStage = Stage.MENU;
+        adMaker = new AdMaker();
+        adMaker.requestBanner();
         initGameObjects();
         for (int i=1; i<correspondingTags.Length; i++)
         {

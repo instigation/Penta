@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Penta;
 
 public class PuzzleSetRenderer : MonoBehaviour {
     /// <summary>

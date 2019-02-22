@@ -52,9 +52,6 @@ public class PuzzleStageController : MonoBehaviour {
         else
             return defaultForNoKey;
     }
-    private void renderAd() {
-        BannerMaker.requestBanner();
-    }
     private void setInput() {
         InputValidator workingspaceValidator = new EmptyValidator();
         input = new MouseInputWrapper(__canvas, workingspaceValidator);
