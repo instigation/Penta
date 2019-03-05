@@ -49,6 +49,11 @@ public class ProgressBar : MonoBehaviour
             advanceSubStage();
         }
     }
+    public void resetStage()
+    {
+        subStage = 0;
+        updateTextAndBar();
+    }
     public int getStage()
     {
         return stage;

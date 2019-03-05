@@ -22,6 +22,10 @@ public class ScoreChanger : MonoBehaviour{
         setScore(score);
     }
 
+    public void reset()
+    {
+        setScore(0);
+    }
     public IEnumerator changeGradually(int amount) {
         int originalScore = getScore();
         for(int score = originalScore; score <= originalScore + amount; score++) {

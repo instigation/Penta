@@ -14,11 +14,14 @@ public class Timer : MonoBehaviour
     private Transform fill;
     private Transform fillArea;
     private readonly float maxTimeInSecond = 30;
-    private readonly float manualTimeChangeSpeedFactor = 5;
+    private readonly float timeChangeDurationInSecond = 0.2F;
     // value보다 정확한 버전이다. value만 자꾸 바꿔쓰면 오차 많아질까봐 (deltaTime쓰니)
     // 그래서 value는 leftoverTimeInSecond로 update만 하고 읽지 않는다 
+    // leftoverTimeInSecond는 음수일 수도 있다.
     private float leftoverTimeInSecond;
     private float deltaTime;
+    private bool isPaused = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,16 +34,25 @@ public class Timer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        deltaTime = Time.deltaTime;
-        changeTime(-deltaTime);
+        if (!isPaused)
+        {
+            deltaTime = Time.deltaTime;
+            changeTime(-deltaTime);
+        }
+    }
+
+    public void refillTime()
+    {
+        StartCoroutine(manuallyChangeTime(maxTimeInSecond-leftoverTimeInSecond));
     }
 
     public IEnumerator manuallyChangeTime(float second)
     {
-        while(second > deltaTime*manualTimeChangeSpeedFactor)
+        float timeChangeSpeedFactor = second / timeChangeDurationInSecond;
+        while(second > deltaTime*timeChangeSpeedFactor)
         {
-            changeTime(deltaTime*manualTimeChangeSpeedFactor);
-            second -= deltaTime*manualTimeChangeSpeedFactor;
+            changeTime(deltaTime*timeChangeSpeedFactor);
+            second -= deltaTime*timeChangeSpeedFactor;
             yield return null;
         }
         if (second >= 0)
@@ -54,6 +66,15 @@ public class Timer : MonoBehaviour
     {
         return Time.fixedTime;
     }
+
+    public float getLeftoverTimeInSecond()
+    {
+        return leftoverTimeInSecond;
+    }
+
+    public void pause() { isPaused = true; }
+
+    public void run() { isPaused = false; }
 
     private void changeTime(float deltaTimeInSecond)
     {
@@ -87,6 +108,11 @@ public class Timer : MonoBehaviour
             float temp = Mathf.Abs((firstThreshold+secondThreshold)/2-leftoverTimeInSecond) / ((firstThreshold-secondThreshold)/2);
             fillArea.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0.25f*temp);
             fillArea.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1-0.25f*temp);
+        }
+        else
+        {
+            fillArea.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0.25f);
+            fillArea.GetComponent<RectTransform>().anchorMax = new Vector2(1, 0.75f);
         }
     }
 }

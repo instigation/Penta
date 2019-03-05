@@ -12,6 +12,7 @@ public class PuzzleStageController : MonoBehaviour {
     public ProgressBar __progressBar;
     public GameObject __bonusText;
     public StageChanger __stageChanger;
+    public GameObject __gameOverPanel;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
@@ -25,9 +26,11 @@ public class PuzzleStageController : MonoBehaviour {
     }
     void OnEnable()
     {
-        if (!notEnabledYet)
-            renderPuzzle();
-        notEnabledYet = false;
+        startStage();
+    }
+    private void OnDisable()
+    {
+        endStage();
     }
     private void setAndroidLogger() {
         logger = new AndroidLogger();
@@ -62,33 +65,45 @@ public class PuzzleStageController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
-        input.update();
-        if(!input.noTouching()) {
-            //only process the first touch
-            if (input.touchBegan()) {
-                __controller.selectOnPosition(input.position(), __renderer.__gapBtwPieceBoxes/2);
-                __controller.tryToExtractSelected();
-                __controller.moveSelectedTo(input.position());
-            }
-            else if (input.touchMoved()) {
-                __controller.moveSelectedFor(input.deltaPosition());
-            }
-            else if (input.touchEnded()) {
-                if (__controller.tryToInsertSelected())
+    void Update ()
+    {
+        if (isGameOvered())
+        {
+            pauseStage();
+        }
+        else
+        {
+            input.update();
+            if (!input.noTouching())
+            {
+                //only process the first touch
+                if (input.touchBegan())
                 {
-                    float currentStageTime = __timer.getCurrentStageTime();
-                    InsertionResult insertionResult = puzzleSet.board.lastInsertionResult();
-                    bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
-                    addTime(bonusCalculator.getBonusTime());
-                    addScore(bonusCalculator.getBonusScore());
-                    bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedPosition());
-                    if (puzzleSet.board.isSolved())
-                        clearStage();
+                    __controller.selectOnPosition(input.position(), __renderer.__gapBtwPieceBoxes / 2);
+                    __controller.tryToExtractSelected();
+                    __controller.moveSelectedTo(input.position());
                 }
-                __controller.unSelect();
+                else if (input.touchMoved())
+                {
+                    __controller.moveSelectedFor(input.deltaPosition());
+                }
+                else if (input.touchEnded())
+                {
+                    if (__controller.tryToInsertSelected())
+                    {
+                        float currentStageTime = __timer.getCurrentStageTime();
+                        InsertionResult insertionResult = puzzleSet.board.lastInsertionResult();
+                        bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
+                        addTime(bonusCalculator.getBonusTime());
+                        addScore(bonusCalculator.getBonusScore());
+                        bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedPosition());
+                        if (puzzleSet.board.isSolved())
+                            clearPuzzle();
+                    }
+                    __controller.unSelect();
+                }
+                __controller.highlightBoardBySelected();
             }
-            __controller.highlightBoardBySelected();
         }
     }
 
@@ -177,14 +192,18 @@ public class PuzzleStageController : MonoBehaviour {
         }
     }
 
-    private void clearStage() {
-        clearPuzzle();
+    private void clearPuzzle() {
+        puzzleSet.destroy();
         __progressBar.progressByOne();
         if (__progressBar.isEnded())
             __stageChanger.toStage(Stage.MENU);
             // TODO: render skippable ad, revive, ...
         else
             renderPuzzle();
+    }
+    private bool isGameOvered()
+    {
+        return __timer.getLeftoverTimeInSecond() < 0.0f;
     }
     private void addScore(int amount) {
         StartCoroutine(__scoreChanger.changeGradually(amount));
@@ -193,7 +212,39 @@ public class PuzzleStageController : MonoBehaviour {
     {
         StartCoroutine(__timer.manuallyChangeTime(amount));
     }
-    private void clearPuzzle() {
+    public void resetStage()
+    {
+        Debug.Log("restart!");
+        endStage();
+        __scoreChanger.reset();
+        __progressBar.resetStage();
+        __stageChanger.toStage(Stage.MENU);
+    }
+    public void endStage()
+    {
         puzzleSet.destroy();
+        __timer.pause();
+        __gameOverPanel.SetActive(false);
+    }
+    public void startStage()
+    {
+        if (!notEnabledYet)
+            renderPuzzle();
+        notEnabledYet = false;
+
+        __gameOverPanel.SetActive(false);
+        __timer.refillTime();
+        __timer.run();
+    }
+    public void pauseStage()
+    {
+        __gameOverPanel.SetActive(true);
+        __timer.pause();
+    }
+    public void reviveStage()
+    {
+        __gameOverPanel.SetActive(false);
+        __timer.refillTime();
+        __timer.run();
     }
 }

@@ -2,14 +2,14 @@
 using UnityEngine;
 using System.Collections;
 
-public class AdMaker
+public class AdManager
 {
 
     private InterstitialAd interstitial;
     private BannerView bannerView;
     private RewardBasedVideoAd rewardBasedVideo;
 
-    public AdMaker()
+    public AdManager()
     {
         // TODO: get AppId
 
@@ -34,12 +34,16 @@ public class AdMaker
 #endif
 
         // Create a 320x50 banner at the bottom of the screen.
-        BannerView bannerView = new BannerView(adUnitId, AdSize.Banner, AdPosition.Bottom);
+        bannerView = new BannerView(adUnitId, AdSize.Banner, AdPosition.Bottom);
         // Create an empty ad request.
         AdRequest request = new AdRequest.Builder().Build();
         // Load the banner with the request.
         bannerView.LoadAd(request);
     }
+
+    public void hideBanner() { bannerView.Hide(); }
+
+    public void showBanner() { bannerView.Show(); }
 
     public void requestInterstitial()
     {

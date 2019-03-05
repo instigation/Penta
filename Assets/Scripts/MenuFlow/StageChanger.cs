@@ -9,12 +9,12 @@ public class StageChanger : MonoBehaviour
     private Stage currentStage;
     private string[] correspondingTags = { "Menu", "PuzzleStage", "Setting", "Leaderboard" };
     public GameObject[][] gameObjects;
-    private AdMaker adMaker;
+    private AdManager adMaker;
 
     void Awake()
     {
         currentStage = Stage.MENU;
-        adMaker = new AdMaker();
+        adMaker = new AdManager();
         adMaker.requestBanner();
         initGameObjects();
         for (int i=1; i<correspondingTags.Length; i++)
@@ -40,6 +40,7 @@ public class StageChanger : MonoBehaviour
     {
         setGameObjectsWithStage(currentStage, false);
         setGameObjectsWithStage((Stage)stage, true);
+        setAds((Stage)stage);
         currentStage = (Stage)stage;
     }
     private void setGameObjectsWithStage(Stage stage, bool isActive)
@@ -49,5 +50,12 @@ public class StageChanger : MonoBehaviour
         {
             obj.SetActive(isActive);
         }
+    }
+    private void setAds(Stage stage)
+    {
+        if (stage == Stage.PUZZLE)
+            adMaker.hideBanner();
+        else
+            adMaker.showBanner();
     }
 }
