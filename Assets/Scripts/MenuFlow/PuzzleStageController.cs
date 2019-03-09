@@ -17,7 +17,6 @@ public class PuzzleStageController : MonoBehaviour {
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
     private BonusCalculator bonusCalculator;
-    private bool notEnabledYet = true;
 
     // Use this for initialization
     void Start () {
@@ -214,7 +213,6 @@ public class PuzzleStageController : MonoBehaviour {
     }
     public void resetStage()
     {
-        Debug.Log("restart!");
         endStage();
         __scoreChanger.reset();
         __progressBar.resetStage();
@@ -228,13 +226,12 @@ public class PuzzleStageController : MonoBehaviour {
     }
     public void startStage()
     {
-        if (!notEnabledYet)
-            renderPuzzle();
-        notEnabledYet = false;
+        renderPuzzle();
 
         __gameOverPanel.SetActive(false);
         __timer.refillTime();
         __timer.run();
+        __progressBar.resetStage();
     }
     public void pauseStage()
     {

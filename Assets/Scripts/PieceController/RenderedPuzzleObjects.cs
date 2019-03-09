@@ -384,7 +384,6 @@ public class RenderedPuzzle {
         foreach(Coordinate index in fittedIndexes)
         {
             Vector2 pos = UnityUtils.getPositionOfUIElement(board[index.x][index.y]);
-            Debug.Log(pos);
             if (max_x < pos.x)
                 max_x = pos.x;
             if (min_x > pos.x)

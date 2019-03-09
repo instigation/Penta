@@ -2,24 +2,47 @@
 using UnityEngine;
 using System.Collections;
 
-public class AdManager
+public class AdManager: MonoBehaviour
 {
+    public PuzzleStageController puzzleStageController;
 
     private InterstitialAd interstitial;
     private BannerView bannerView;
-    private RewardBasedVideoAd rewardBasedVideo;
+    private RewardBasedVideoAd rewardBasedVideoForRevive;
+    private bool isRewarded;
 
-    public AdManager()
+    private void Start()
     {
         // TODO: get AppId
 
+        requestInterstitial();
+
         // Get singleton reward based video ad reference.
-        this.rewardBasedVideo = RewardBasedVideoAd.Instance;
+        this.rewardBasedVideoForRevive = RewardBasedVideoAd.Instance;
         requestRewardBasedVideo();
+        // Called when an ad request failed to load.
+        this.interstitial.OnAdFailedToLoad += HandleOnAdFailedToLoad;
+        // Called when the ad is closed.
+        this.interstitial.OnAdClosed += HandleOnAdClosed;
 
 
+        // Called when an ad request has successfully loaded.
+        rewardBasedVideoForRevive.OnAdLoaded += HandleRewardBasedVideoLoaded;
+        // Called when an ad request failed to load.
+        rewardBasedVideoForRevive.OnAdFailedToLoad += HandleRewardBasedVideoFailedToLoad;
         // Called when the user should be rewarded for watching a video.
-        rewardBasedVideo.OnAdRewarded += HandleRewardBasedVideoRewarded;
+        rewardBasedVideoForRevive.OnAdRewarded += HandleRewardBasedVideoRewarded;
+        // Called when the ad is closed.
+        rewardBasedVideoForRevive.OnAdClosed += HandleRewardBasedVideoClosed;
+    }
+    public void HandleOnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+    {
+        MonoBehaviour.print("HandleFailedToReceiveAd event received with message: "
+                            + args.Message);
+    }
+    public void HandleOnAdClosed(object sender, System.EventArgs args)
+    {
+        requestInterstitial();
     }
 
     public void requestBanner()
@@ -85,24 +108,35 @@ public class AdManager
         // Create an empty ad request.
         AdRequest request = new AdRequest.Builder().Build();
         // Load the rewarded video ad with the request.
-        this.rewardBasedVideo.LoadAd(request, adUnitId);
+        this.rewardBasedVideoForRevive.LoadAd(request, adUnitId);
     }
 
-
+    public void HandleRewardBasedVideoLoaded(object sender, System.EventArgs args)
+    {
+        isRewarded = false;
+    }
+    public void HandleRewardBasedVideoFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+    {
+        Debug.Log("Rewarded video ad failed to load: " + args.Message);
+        // Handle the ad failed to load event.
+    }
     public void HandleRewardBasedVideoRewarded(object sender, Reward args)
     {
-        string type = args.Type;
-        double amount = args.Amount;
-        MonoBehaviour.print(
-            "HandleRewardBasedVideoRewarded event received for "
-                        + amount.ToString() + " " + type);
+        puzzleStageController.reviveStage();
+        isRewarded = true;
+    }
+    public void HandleRewardBasedVideoClosed(object sender, System.EventArgs args)
+    {
+        requestRewardBasedVideo();
+        if(!isRewarded)
+            puzzleStageController.resetStage();
     }
 
-    public void UserOptToWatchAd()
+    public void UserOptToWatchReviveAd()
     {
-        if (rewardBasedVideo.IsLoaded())
+        if (rewardBasedVideoForRevive.IsLoaded())
         {
-            rewardBasedVideo.Show();
+            rewardBasedVideoForRevive.Show();
         }
     }
 }

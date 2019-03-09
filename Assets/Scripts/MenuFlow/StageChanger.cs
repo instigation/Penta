@@ -6,29 +6,15 @@ public enum Stage { MENU, PUZZLE, SETTING, LEADERBOARD };
 
 public class StageChanger : MonoBehaviour
 {
+    public GameObject[] allGameObjects;
     private Stage currentStage;
     private string[] correspondingTags = { "Menu", "PuzzleStage", "Setting", "Leaderboard" };
-    public GameObject[][] gameObjects;
-    private AdManager adMaker;
+    public AdManager adManager;
 
     void Awake()
     {
         currentStage = Stage.MENU;
-        adMaker = new AdManager();
-        adMaker.requestBanner();
-        initGameObjects();
-        for (int i=1; i<correspondingTags.Length; i++)
-        {
-            setGameObjectsWithStage((Stage)i, false);
-        }
-    }
-    private void initGameObjects()
-    {
-        gameObjects = new GameObject[correspondingTags.Length][];
-        for (int i = 0; i < correspondingTags.Length; i++)
-        {
-            gameObjects[i] = GameObject.FindGameObjectsWithTag(correspondingTags[i]);
-        }
+        adManager.requestBanner();
     }
     // Update is called once per frame
     void Update()
@@ -45,17 +31,17 @@ public class StageChanger : MonoBehaviour
     }
     private void setGameObjectsWithStage(Stage stage, bool isActive)
     {
-        GameObject[] objs = gameObjects[(int)stage];
-        foreach (GameObject obj in objs)
+        foreach(GameObject obj in allGameObjects)
         {
-            obj.SetActive(isActive);
+            if (obj.tag == correspondingTags[(int)stage])
+               obj.SetActive(isActive);
         }
     }
     private void setAds(Stage stage)
     {
         if (stage == Stage.PUZZLE)
-            adMaker.hideBanner();
+            adManager.hideBanner();
         else
-            adMaker.showBanner();
+            adManager.showBanner();
     }
 }
