@@ -231,7 +231,7 @@ public class PuzzleStageController : MonoBehaviour {
         __gameOverPanel.SetActive(false);
         __timer.refillTime();
         __timer.run();
-        __progressBar.resetStage();
+        __progressBar.progressByOne();
     }
     public void pauseStage()
     {

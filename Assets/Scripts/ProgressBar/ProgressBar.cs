@@ -25,9 +25,9 @@ public class ProgressBar : MonoBehaviour
         }
         else
         {
-            stage = 1;
+            stage = 0;
             GlobalInformation.storeKeyValue("stage", stage);
-            subStage = 0;
+            subStage = 3;
             GlobalInformation.storeKeyValue("subStage", subStage);
         }
         slider = gameObject.transform.GetChild(1);
