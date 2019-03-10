@@ -226,12 +226,14 @@ public class PuzzleStageController : MonoBehaviour {
     }
     public void startStage()
     {
+        // progressByOne과 setBonusCalculator의 순서는 중요한데, bonus calculator가 stage number에 영향받기 때문
+        __progressBar.progressByOne();
+        setBonusCalculator();
         renderPuzzle();
 
         __gameOverPanel.SetActive(false);
         __timer.refillTime();
         __timer.run();
-        __progressBar.progressByOne();
     }
     public void pauseStage()
     {

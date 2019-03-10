@@ -13,4 +13,14 @@ public static class GlobalInformation {
     public static bool contains(object key) {
         return information.Contains(key);
     }
+    public static object getOrInitValue(object key, object initialValue)
+    {
+        if (contains(key))
+            return getValue(key);
+        else
+        {
+            storeKeyValue(key, initialValue);
+            return initialValue;
+        }
+    }
 }

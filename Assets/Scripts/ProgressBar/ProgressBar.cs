@@ -51,7 +51,8 @@ public class ProgressBar : MonoBehaviour
     }
     public void resetStage()
     {
-        subStage = 0;
+        subStage = 3;
+        stage--;
         updateTextAndBar();
     }
     public int getStage()
