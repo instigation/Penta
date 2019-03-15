@@ -43,10 +43,15 @@ public class Timer : MonoBehaviour
 
     public void refillTime()
     {
-        StartCoroutine(manuallyChangeTime(maxTimeInSecond-leftoverTimeInSecond));
+        manuallyChangeTime(maxTimeInSecond - leftoverTimeInSecond);
     }
 
-    public IEnumerator manuallyChangeTime(float second)
+    public void manuallyChangeTime(float second)
+    {
+        StartCoroutine(manuallyChangeTimeCoroutine(second));
+    }
+
+    public IEnumerator manuallyChangeTimeCoroutine(float second)
     {
         float timeChangeSpeedFactor = second / timeChangeDurationInSecond;
         while(second > deltaTime*timeChangeSpeedFactor)

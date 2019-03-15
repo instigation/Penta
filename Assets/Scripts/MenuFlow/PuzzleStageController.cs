@@ -214,11 +214,11 @@ public class PuzzleStageController : MonoBehaviour {
         return __timer.getLeftoverTimeInSecond() < 0.0f;
     }
     private void addScore(int amount) {
-        StartCoroutine(__scoreChanger.changeGradually(amount));
+        __scoreChanger.changeGradually(amount);
     }
     private void addTime(float amount)
     {
-        StartCoroutine(__timer.manuallyChangeTime(amount));
+        __timer.manuallyChangeTime(amount);
     }
     public void resetStage()
     {

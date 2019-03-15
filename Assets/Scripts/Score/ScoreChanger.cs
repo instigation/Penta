@@ -20,7 +20,11 @@ public class ScoreChanger : MonoBehaviour{
     {
         setScore(0);
     }
-    public IEnumerator changeGradually(int amount) {
+    public void changeGradually(int amount)
+    {
+        StartCoroutine(changeGraduallyCoroutine(amount));
+    }
+    private IEnumerator changeGraduallyCoroutine(int amount) {
         int originalScore = getScore();
         for(int score = originalScore; score <= originalScore + amount; score++) {
             setScore(score);
