@@ -113,7 +113,7 @@ public class PuzzleStageController : MonoBehaviour {
         private bool isStreakOccured;
         private bool isCorrectInsertionOccured;
         private int streak;
-        private int combo;
+        //private int combo;
         private ProgressBar progressBar;
         private GameObject bonusText;
         private GameObject canvas;
@@ -125,7 +125,7 @@ public class PuzzleStageController : MonoBehaviour {
             isStreakOccured = false;
             isCorrectInsertionOccured = false;
             streak = 0;
-            combo = 0;
+            //combo = 0;
             this.progressBar = progressBar;
             this.bonusText = bonusText;
             this.canvas = canvas;
@@ -133,7 +133,7 @@ public class PuzzleStageController : MonoBehaviour {
         public void calculateOnInsertion(InsertionResult insertionResult, float currentStageTime)
         {
             switch (insertionResult)
-                {
+            {
                 case InsertionResult.CORRECT:
                     isCorrectInsertionOccured = true;
                     if (isLastInsertionCorrect)
@@ -143,10 +143,10 @@ public class PuzzleStageController : MonoBehaviour {
                     }
                     else
                         isStreakOccured = false;
-                    if (currentStageTime - lastCorrectInsertionTime <= 2.0f)
-                        combo++;
-                    else
-                        combo = 0;
+                    /* if (currentStageTime - lastCorrectInsertionTime <= 2.0f)
+                         combo++;
+                     else
+                         combo = 0; */
                     isLastInsertionCorrect = true;
                     lastCorrectInsertionTime = currentStageTime;
                     break;
@@ -168,7 +168,7 @@ public class PuzzleStageController : MonoBehaviour {
         }
         public int getBonusScore()
         {
-            return isCorrectInsertionOccured? progressBar.getStage()*(combo + streak + 1) : 0;
+            return isCorrectInsertionOccured ? progressBar.getStage() * (streak + 1) : 0;//(combo + streak + 1) : 0;
         }
         public void playBonusText(Vector2 position)
         {
@@ -177,19 +177,28 @@ public class PuzzleStageController : MonoBehaviour {
                 GameObject ret = Instantiate(bonusText);
                 ret.transform.SetParent(canvas.transform, false);
                 UnityUtils.moveUIElementToPosition(ret, position);
-                ret.transform.GetChild(0).GetComponent<Text>().text = getBonusText();
+                ret.transform.GetChild(0).GetChild(1).GetComponent<Text>().text = getScoreText();
+                ret.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = getComboText();
             }
         }
-        private string getBonusText()
+        private string getComboText()
         {
-            string ret = "\n+" + getBonusScore().ToString();
+            string ret; //= "\n+" + getBonusScore().ToString();
             if (streak != 0)
-                ret = "\nSmart! x" + streak.ToString() + ret;
-            if (combo != 0)
-                ret = "Fast! x" + combo.ToString() + ret;
+                ret = streak.ToString() + " Combo!";// + ret;
+            else ret = "";
+            //if (combo != 0)
+            //    ret = "Fast! x" + combo.ToString() + ret;
+            return ret;
+        }
+
+        private string getScoreText()
+        {
+            string ret = "+" + getBonusScore().ToString();
             return ret;
         }
     }
+
 
     private void clearPuzzle() {
         puzzleSet.destroy();
