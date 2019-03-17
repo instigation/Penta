@@ -11,14 +11,14 @@ public interface GeneralInput {
     bool touchEnded();
     // precondition: valid only during BEGAN~MOVED~ENDED
     float timeCollapsedAfterLastTouch();
-    Vector3 position();
-    Vector3 deltaPosition();
+    Vector2 anchoredPosition();
+    Vector2 deltaAnchoredPosition();
 }
 
 public class MouseInputWrapper : GeneralInput {
     private enum state { BEGAN, MOVED, ENDED, IDLE };
     private state current = state.IDLE;
-    private Vector3 mousePosition;
+    private Vector3 mouseAnchoredPosition;
     private GameObject canvas;
     private InputValidator validator;
     private int lastTouchedFrame;
@@ -34,7 +34,7 @@ public class MouseInputWrapper : GeneralInput {
     }
     private void stateTransition() {
         if (current == state.IDLE) {
-            mousePosition = position();
+            mouseAnchoredPosition = anchoredPosition();
             if (Input.GetMouseButtonDown(0)) {
                 current = state.BEGAN;
                 int currentTouchedFrame = Time.frameCount;
@@ -65,17 +65,18 @@ public class MouseInputWrapper : GeneralInput {
     public bool touchEnded() {
         return current == state.ENDED;
     }
-    public Vector3 position() {
+    public Vector2 anchoredPosition() {
         //Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         //mousePos.x *= canvasWidth;
         //mousePos.y *= canvasHeight;
         Vector2 mousePos;
+        // TODO: Is canvas anchor and children anchors should be the same or something?
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.GetComponent<RectTransform>(), Input.mousePosition, null, out mousePos);
         return mousePos;
     }
-    public Vector3 deltaPosition() {
-        Vector3 ret = position() - mousePosition;
-        mousePosition = position();
+    public Vector2 deltaAnchoredPosition() {
+        Vector2 ret = anchoredPosition() - (Vector2)mouseAnchoredPosition;
+        mouseAnchoredPosition = anchoredPosition();
         return ret;
     }
     public float timeCollapsedAfterLastTouch() {

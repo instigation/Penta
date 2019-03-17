@@ -18,138 +18,149 @@ public class RenderedPuzzleSet {
             candidate.destroy();
         board.destroy();
     }
+    public float getDestroyAnimationTimeInSecond()
+    {
+        // Because the destroy time of puzzle and candidates are the same.
+        return candidates[0].getDestroyAnimationTimeInSecond();
+    }
 }
 
 public class StructuredPiece {
-    protected List<GameObject> blocks;
+    protected List<Block> blocks;
     protected List<Coordinate> coors;
 
-    public StructuredPiece(List<GameObject> blocks, List<Coordinate> coors) {
+    public StructuredPiece(List<Block> blocks, List<Coordinate> coors) {
         this.blocks = blocks;
         this.coors = coors;
     }
-    public Vector3 centerPosition() {
+    public Vector2 centerAnchoredPosition() {
         Utils.centerToOrigin(coors);
-        return getOriginPosition();
+        return getOriginAnchoredPosition();
     }
-    public Vector3 leftMostPosition() {
+    public Vector2 leftMostAnchoredPosition() {
         Utils.leftMostToOrigin(coors);
-        return getOriginPosition();
+        return getOriginAnchoredPosition();
     }
     // origin means (0,0) in coordinate
-    public Vector3 getOriginPosition() {
-        Vector3 defalutPosition = UnityUtils.getPositionOfUIElement(blocks[0]);
+    public Vector2 getOriginAnchoredPosition() {
+        Vector2 defalutPosition = blocks[0].getAnchoredPosition();
         float x = defalutPosition.x, y = defalutPosition.y;
         for (int i = 0; i < coors.Count; i++) {
             if (coors[i].x == 0)
-                x = UnityUtils.getPositionOfUIElement(blocks[i]).x;
+                x = blocks[i].getAnchoredPosition().x;
             if (coors[i].y == 0)
-                y = UnityUtils.getPositionOfUIElement(blocks[i]).y;
+                y = blocks[i].getAnchoredPosition().y;
         }
-        return new Vector3(x, y);
+        return new Vector2(x, y);
     }
-    public void rotateClockWiseAQuarterWithPivotPosition(Vector3 pivotPosition) {
+    public void rotateClockWiseAQuarterWithPivotAnchoredPosition(Vector2 pivotPosition) {
         Utils.rotateSetForTimes(coors, 1);
-        rotateGameObjectsWithPivotPosition(pivotPosition);
+        rotateGameObjectsWithPivotAnchoredPosition(pivotPosition);
     }
-    private void rotateGameObjectsWithPivotPosition(Vector3 pivotPosition) {
-        foreach (GameObject block in blocks) {
-            Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
-            Vector3 distance = blockPosition - pivotPosition;
-            Vector3 newPosition = pivotPosition + UnityUtils.rotateClockwiseAQuater(distance);
-            UnityUtils.moveUIElementToPosition(block, newPosition);
+    private void rotateGameObjectsWithPivotAnchoredPosition(Vector2 pivotPosition) {
+        foreach (Block block in blocks) {
+            Vector2 blockPosition = block.getAnchoredPosition();
+            Vector2 distance = blockPosition - pivotPosition;
+            Vector2 newPosition = pivotPosition + UnityUtils.rotateClockwiseAQuater(distance);
+            block.moveToAnchoredPosition(newPosition);
         }
     }
-    public List<Vector3> getBlockPositions() {
-        List<Vector3> ret = new List<Vector3>();
-        foreach (GameObject block in blocks) {
-            Vector3 newPosition = UnityUtils.getPositionOfUIElement(block);
+    public List<Vector2> getBlockAnchoredPositions() {
+        List<Vector2> ret = new List<Vector2>();
+        foreach (Block block in blocks) {
+            Vector3 newPosition = block.getAnchoredPosition();
             ret.Add(newPosition);
         }
         return ret;
     }
-    public float getRightMostXPosition() {
-        float maxXPos = UnityUtils.getPositionOfUIElement(blocks[0]).x;
-        foreach (GameObject block in blocks) {
-            float x = UnityUtils.getPositionOfUIElement(block).x;
+    public float getRightMostXAnchoredPosition() {
+        float maxXPos = blocks[0].getAnchoredPosition().x; 
+        foreach (Block block in blocks) {
+            float x = block.getAnchoredPosition().x;
             if (maxXPos < x)
                 maxXPos = x;
         }
         return maxXPos;
     }
     public float blockSize() {
+        // TODO: WHAT block size?
         // assumes the block to be square
-        return UnityUtils.getWidthOfUIElement(blocks[0]);
+        return blocks[0].getWidth();
     }
-    public void moveFor(Vector3 distance) {
-        foreach (GameObject block in blocks)
-            UnityUtils.moveUIElementForDistance(block, distance);
+    public void moveForAnchoredVector(Vector2 deltaPosition) {
+        foreach (Block block in blocks)
+            block.moveForAnchoredVector(deltaPosition);
     }
     public void scale(float factor)
     {
-        Vector3 pivotPosition = getOriginPosition();
-        foreach (GameObject block in blocks)
+        Vector2 pivotPosition = getOriginAnchoredPosition();
+        foreach (Block block in blocks)
         {
-            Vector3 blockPosition = UnityUtils.getPositionOfUIElement(block);
-            UnityUtils.moveUIElementToPosition(block, pivotPosition + factor*(blockPosition - pivotPosition));
-            UnityUtils.scaleSizeOfUIElement(block, factor);
+            Vector2 blockPosition = block.getAnchoredPosition();
+            block.moveToAnchoredPosition(pivotPosition + factor * (blockPosition - pivotPosition));
+            block.scale(factor);
         }
+    }
+    public float getDestroyAnimationTimeInSecond()
+    {
+        // TODO
+        return 1.0f;
     }
 }
 
 public class RenderedPiece : StructuredPiece{
-    private Vector3 centerOriginalPosition;
+    private Vector3 centerOriginalAnchoredPosition;
     // The renderedPiece is either candidate size or boardFit size.
     private bool isCandidateSize = true;
     private readonly float candidateBoardBlockSizeRatio = 2.0f;
 
-    public RenderedPiece(List<GameObject> rBlocks, List<Coordinate> blocks) 
+    public RenderedPiece(List<Block> rBlocks, List<Coordinate> blocks) 
         :base(rBlocks, blocks) {
-        centerOriginalPosition = centerPosition();
+        centerOriginalAnchoredPosition = centerAnchoredPosition();
     }
     public void rotate() {
-        rotateClockWiseAQuarterWithPivotPosition(centerPosition());
+        rotateClockWiseAQuarterWithPivotAnchoredPosition(centerAnchoredPosition());
     }
     public void reset() {
-        Vector3 currentOriginPosition = centerPosition();
-        moveFor(centerOriginalPosition - currentOriginPosition);
+        Vector3 currentOriginAnchoredPosition = centerAnchoredPosition();
+        moveForAnchoredVector(centerOriginalAnchoredPosition - currentOriginAnchoredPosition);
     }
-    public bool includes(Vector3 point) {
-        List<Vector3> blocks = getBlockPositions();
+    public bool includes(Vector2 point) {
+        List<Vector2> blockAnchoredPositions = getBlockAnchoredPositions();
         float sideLength = blockSize();
-        foreach(Vector3 block in blocks) {
-            var square = new UnityUtils.Square(block, sideLength);
+        foreach(Vector2 blockAnchoredPosition in blockAnchoredPositions) {
+            var square = new UnityUtils.Square(blockAnchoredPosition, sideLength);
             if (square.includes(point))
                 return true;
         }
         return false;
     }
-    public bool includesInNeighborhood(Vector3 point, float padding) {
+    public bool includesInNeighborhood(Vector2 point, float padding) {
         // If padding=0, the neighborhood means the envelope covering the piece.
         // {neighborhood width} = {envelope width} + 2*padding
         // (similar for height)
-        List<Vector3> blocks = getBlockPositions();
+        List<Vector2> blockAnchoredPositions = getBlockAnchoredPositions();
         float sideLength = blockSize();
         float left=100000, right=-100000, top=-100000, bottom=100000;
-        foreach (Vector3 block in blocks) {
-            float x = block.x;
+        foreach (Vector2 blockAnchoredPosition in blockAnchoredPositions) {
+            float x = blockAnchoredPosition.x;
             if (x < left)
                 left = x;
             if (x > right)
                 right = x;
-            float y = block.y;
+            float y = blockAnchoredPosition.y;
             if (y > top)
                 top = y;
             if (y < bottom)
                 bottom = y;
         }
-        var rect = new UnityUtils.Rectangle(new Vector3((left+right)/2, (top+bottom)/2, 0), right-left+sideLength+2*padding, top-bottom+sideLength+2*padding);
+        var rect = new UnityUtils.Rectangle(new Vector2((left+right)/2, (top+bottom)/2), right-left+sideLength+2*padding, top-bottom+sideLength+2*padding);
         return rect.includes(point);
 
     }
     public void destroy() {
-        foreach(GameObject block in blocks) {
-            Object.Destroy(block);
+        foreach(Block block in blocks) {
+            block.destroy();
         }
     }
     public void setToCandidateSize()
@@ -171,25 +182,21 @@ public class RenderedPiece : StructuredPiece{
 }
 
 public class RenderedPuzzle {
-    private List<List<GameObject>> board;
-    private List<List<GameObject>> background;
+    private List<List<Block>> board;
+    private List<List<BackgroundBlock>> background;
     private int blinkHash = Animator.StringToHash("blink");
     private List<List<bool>> isOccupied;
     private List<List<bool>> isHighlighted;
-    private Color originalBoardColor;
     private const float rangePerHalfBlockSize = 0.9999f;
     private bool recentInsertionSuccess;
     private InsertionResult recentInsertionResult;
     private BoardComparer lastInsertionComparer;
 
     // precondition: board is aligned as List of pieces. That is, List of List of GameObject = List of pieces.
-    public RenderedPuzzle(List<List<GameObject>> board, List<List<GameObject>> background) {
+    public RenderedPuzzle(List<List<Block>> board, List<List<BackgroundBlock>> background) {
         this.board = board;
         this.background = background;
         initMaskAsLengthOfBlocks(ref isOccupied);
-        foreach (List<GameObject> blockList in board)
-            foreach (GameObject block in blockList)
-                originalBoardColor = block.GetComponent<Image>().color;
     }
     private void initMaskAsLengthOfBlocks(ref List<List<bool>> mask) {
         mask = new List<List<bool>>();
@@ -204,15 +211,15 @@ public class RenderedPuzzle {
 
     private class BoardComparer {
         // TODO: readonly로 바꾸기
-        private List<List<GameObject>> board;
+        private List<List<Block>> board;
         private List<List<bool>> isInvalid;
-        private List<Vector3> target;
+        private List<Vector2> target;
         private bool isTargetFits;
         // Tuple이 없어서 대신 Coordinate를 사용함
         private List<Coordinate> fittedIndexes;
-        private Vector3 delta;
+        private Vector2 deltaAnchoredPosition;
         
-        public BoardComparer(List<List<GameObject>> board, List<List<bool>> isInvalid, List<Vector3> target) {
+        public BoardComparer(List<List<Block>> board, List<List<bool>> isInvalid, List<Vector2> target) {
             this.board = board;
             this.isInvalid = isInvalid;
             this.target = target;
@@ -225,20 +232,21 @@ public class RenderedPuzzle {
                 compareOne(blockPosition);
             }
         }
-        private void compareOne(Vector3 blockPosition) {
+        private void compareOne(Vector2 blockAnchoredPosition) {
+            // Precondition: Anchor positions should be the same.
             for (int i = 0; i < board.Count; i++) {
                 for (int j = 0; j < board[i].Count; j++) {
-                    Vector3 center = UnityUtils.getPositionOfUIElement(board[i][j]);
-                    float blockSize = UnityUtils.getWidthOfUIElement(board[i][j]);
+                    Vector2 centerAnchoredPosition = board[i][j].getAnchoredPosition();
+                    float blockSize = board[i][j].getWidth();
                     float range = (blockSize / 2) * rangePerHalfBlockSize;
-                    var rangeSquare = new UnityUtils.Square(center, range * 2);
-                    if (rangeSquare.includes(blockPosition)) {
+                    var rangeSquare = new UnityUtils.Square(centerAnchoredPosition, range * 2);
+                    if (rangeSquare.includes(blockAnchoredPosition)) {
                         if (isInvalid[i][j]) {
                             isTargetFits = false;
                             return;
                         }
                         else {
-                            delta = center - blockPosition;
+                            deltaAnchoredPosition = centerAnchoredPosition - blockAnchoredPosition;
                             fittedIndexes.Add(new Coordinate(i, j));
                             return;
                         }
@@ -248,13 +256,13 @@ public class RenderedPuzzle {
             isTargetFits = false;
         }
         public bool fits() { return isTargetFits; }
-        public Vector3 getDelta() { return isTargetFits? delta : new Vector3(0, 0); }
+        public Vector2 getDelta() { return isTargetFits? deltaAnchoredPosition : new Vector2(0, 0); }
         public List<Coordinate> getPartiallyFittedIndexes() { return fittedIndexes; }
     }
 
-    public void highlightClosestBlocks(List<Vector3> blockPositions)
+    public void highlightClosestBlocks(List<Vector2> blockAnchoredPositions)
     {
-        BoardComparer comp = new BoardComparer(board, isOccupied, blockPositions);
+        BoardComparer comp = new BoardComparer(board, isOccupied, blockAnchoredPositions);
         resetBlockColors();
         highlightBlocksAt(comp.getPartiallyFittedIndexes());
     }
@@ -262,22 +270,22 @@ public class RenderedPuzzle {
     {
         foreach (Coordinate index in indexes)
         {
-            board[index.x][index.y].GetComponent<Image>().color = Color.green;
+            board[index.x][index.y].setColor(Color.green);
         }
     }
     public void resetBlockColors()
     {
-        foreach(List<GameObject> blockList in board)
+        foreach(List<Block> blockList in board)
         {
-            foreach(GameObject block in blockList)
+            foreach(Block block in blockList)
             {
-                block.GetComponent<Image>().color = originalBoardColor;
+                block.resetColor();
             }
         }
     }
 
-    public Vector3 tryToInsertAndReturnDelta(List<Vector3> blockPositions) {
-        lastInsertionComparer = new BoardComparer(board, isOccupied, blockPositions);
+    public Vector3 tryToInsertAndReturnDelta(List<Vector2> blockAnchoredPositions) {
+        lastInsertionComparer = new BoardComparer(board, isOccupied, blockAnchoredPositions);
         if (lastInsertionComparer.fits()) {
             List<Coordinate> partiallyFittedIndexes = lastInsertionComparer.getPartiallyFittedIndexes();
             occupyBlocksAt(partiallyFittedIndexes);
@@ -303,15 +311,14 @@ public class RenderedPuzzle {
     {
         foreach(Coordinate coor in blinkTargetCoordinates)
         {
-            GameObject blinkTarget = background[coor.x][coor.y];
-            blinkTarget.GetComponent<Animator>().SetTrigger("blink");
+            background[coor.x][coor.y].blink();
         }
     }
     private void occupyBlocksAt(List<Coordinate> indexes) {
         foreach (Coordinate index in indexes)
             isOccupied[index.x][index.y] = true;
     }
-    public bool tryToExtract(List<Vector3> blockPositions) {
+    public bool tryToExtract(List<Vector2> blockAnchoredPositions) {
         // postcondition: extract fail iff the piece is in the correct position
         List<List<bool>> isNotOccupied = new List<List<bool>>();
         foreach(List<bool> subList in isOccupied)
@@ -321,7 +328,7 @@ public class RenderedPuzzle {
                 newList.Add(!isBlockOccupied);
             isNotOccupied.Add(newList);
         }
-        BoardComparer comp = new BoardComparer(board, isNotOccupied, blockPositions);
+        BoardComparer comp = new BoardComparer(board, isNotOccupied, blockAnchoredPositions);
         if (comp.fits())
         {
             if (Utils.isXConsistent(comp.getPartiallyFittedIndexes()))
@@ -360,15 +367,15 @@ public class RenderedPuzzle {
         destroyBoard();
     }
     private void destroyBackground() {
-        destroyDoubleListedGameObject(background);
+        foreach (List<BackgroundBlock> subList in background)
+            foreach (BackgroundBlock block in subList)
+                block.destroy();
     }
-    private void destroyBoard() {
-        destroyDoubleListedGameObject(board);
-    }
-    private void destroyDoubleListedGameObject(List<List<GameObject>> target) {
-        foreach (List<GameObject> subList in target)
-            foreach (GameObject element in subList)
-                Object.Destroy(element);
+    private void destroyBoard()
+    {
+        foreach (List<Block> subList in board)
+            foreach (Block block in subList)
+                block.destroy();
     }
     public bool getRecentInsertionSuccess() {
         return recentInsertionSuccess;
@@ -377,13 +384,13 @@ public class RenderedPuzzle {
     {
         return recentInsertionResult;
     }
-    public Vector2 topOfLastInsertedPosition()
+    public Vector2 topOfLastInsertedAnchoredPosition()
     {
         List<Coordinate> fittedIndexes = lastInsertionComparer.getPartiallyFittedIndexes();
         float max_x = float.NegativeInfinity, min_x = float.PositiveInfinity, max_y = float.NegativeInfinity;
         foreach(Coordinate index in fittedIndexes)
         {
-            Vector2 pos = UnityUtils.getPositionOfUIElement(board[index.x][index.y]);
+            Vector2 pos = board[index.x][index.y].getAnchoredPosition();
             if (max_x < pos.x)
                 max_x = pos.x;
             if (min_x > pos.x)

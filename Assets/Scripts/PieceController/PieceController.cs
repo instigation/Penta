@@ -46,14 +46,14 @@ public class PieceController : MonoBehaviour{
             }
         }
     }
-    public void moveSelectedFor(Vector3 distance) {
+    public void moveSelectedForAnchoredVector(Vector2 vector) {
         if (selected != NONE)
-            candidates[selected].moveFor(distance);
+            candidates[selected].moveForAnchoredVector(vector);
     }
-    public void moveSelectedTo(Vector3 position)
+    public void moveSelectedToAnchoredPosition(Vector2 position)
     {
         if (selected != NONE)
-            candidates[selected].moveFor(position - candidates[selected].getOriginPosition());
+            candidates[selected].moveForAnchoredVector(position - candidates[selected].getOriginAnchoredPosition());
     }
     private void select(int index) {
         selected = index;
@@ -67,12 +67,12 @@ public class PieceController : MonoBehaviour{
         if (selected != NONE)
         {
             RenderedPiece selectedPiece = candidates[selected];
-            Vector3 delta = board.tryToInsertAndReturnDelta(selectedPiece.getBlockPositions());
+            Vector3 delta = board.tryToInsertAndReturnDelta(selectedPiece.getBlockAnchoredPositions());
             if (!board.getRecentInsertionSuccess())
                 resetSelected();
             else
                 isInserted[selected] = true;
-            moveSelectedFor(delta);
+            moveSelectedForAnchoredVector(delta);
             return true;
         }
         else return false;
@@ -82,7 +82,7 @@ public class PieceController : MonoBehaviour{
         if (selected != NONE)
         {
             RenderedPiece selectedPiece = candidates[selected];
-            board.highlightClosestBlocks(selectedPiece.getBlockPositions());
+            board.highlightClosestBlocks(selectedPiece.getBlockAnchoredPositions());
         }
         else
             board.resetBlockColors();
@@ -98,7 +98,7 @@ public class PieceController : MonoBehaviour{
     public void tryToExtractSelected() {
         if(selected != NONE) {
             RenderedPiece selectedPiece = candidates[selected];
-            bool extractionSuccess = board.tryToExtract(selectedPiece.getBlockPositions());
+            bool extractionSuccess = board.tryToExtract(selectedPiece.getBlockAnchoredPositions());
             if (extractionSuccess)
                 isInserted[selected] = false;
             else

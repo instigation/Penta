@@ -34,8 +34,8 @@ public static class UnityUtils{
         return target.GetComponent<RectTransform>().anchoredPosition;
     }
 
-    public static Vector3 rotateClockwiseAQuater(Vector3 vector) {
-        return new Vector3(vector.y, -vector.x);
+    public static Vector2 rotateClockwiseAQuater(Vector2 vector) {
+        return new Vector2(vector.y, -vector.x);
     }
 
     public static void scaleSizeOfUIElement(GameObject target, float factor)

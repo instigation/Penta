@@ -41,7 +41,7 @@ public class PuzzleSetRenderer : MonoBehaviour {
             if (__randomizeRotation)
                 Utils.rotateRandomlySavingWidth(pieceInCoordinate);
             Utils.leftTopToOrigin(pieceInCoordinate);
-            PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __candidateLeftTopBlockSpawnPoint, __gapPerBlockSize);
+            PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __gapPerBlockSize);
             RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnOriginPosition);
             if (i == 2)
             {
@@ -57,12 +57,12 @@ public class PuzzleSetRenderer : MonoBehaviour {
         return ret;
     }
     private void setSpawnPositionBasedOn(RenderedPiece renderedPiece) {
-        spawnOriginPosition.x = renderedPiece.getRightMostXPosition() + __gapBtwPieceBoxes + renderedPiece.blockSize();
+        spawnOriginPosition.x = renderedPiece.getRightMostXAnchoredPosition() + __gapBtwPieceBoxes + renderedPiece.blockSize();
     }
     private RenderedPuzzle renderPuzzle(Puzzle p) {
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
         Utils.centerToOrigin(piecesInCoordinate);
-        PuzzleRenderer renderer = new PuzzleRenderer(__boardBlock, __boardBlockBackground, __pieceBlocks, __centerOfBoard, __gapPerBlockSize);
+        PuzzleRenderer renderer = new PuzzleRenderer(__boardBlock, __boardBlockBackground, __gapPerBlockSize);
         RenderedPuzzle ret = renderer.render(piecesInCoordinate, UnityUtils.getPositionOfUIElement(__centerOfBoard));
         return ret;
     }
@@ -72,11 +72,9 @@ public class PieceRenderer{
     private GameObject pieceBlock;
     private float gapPerBlockSize;
     private Vector3 leftMostPosition;
-    private GameObject spawnPoint;
 
-    public PieceRenderer(GameObject pieceBlock, GameObject spawnPoint, float gapPerBlockSize) {
+    public PieceRenderer(GameObject pieceBlock, float gapPerBlockSize) {
         this.pieceBlock = pieceBlock;
-        this.spawnPoint = spawnPoint;
         this.gapPerBlockSize = gapPerBlockSize;
     }
     public RenderedPiece render(List<Coordinate> blocks, Vector3 originPosition) {
@@ -86,11 +84,11 @@ public class PieceRenderer{
         ///<remarks>
         /// origin means (0,0) in Coordinates
         ///</remarks>
-        List<GameObject> renderedBlocks = new List<GameObject>();
+        List<Block> renderedBlocks = new List<Block>();
         float distance = blockSize() * (1 + gapPerBlockSize);
         foreach (Coordinate block in blocks) {
             Vector3 position = originPosition + UnityUtils.toVector3(block) * distance;
-            GameObject renderedBlock = renderOneBlockAt(position);
+            Block renderedBlock = renderOneBlockAt(position).GetComponent<Block>();
             renderedBlocks.Add(renderedBlock);
         }
         return new RenderedPiece(renderedBlocks, blocks);
@@ -107,23 +105,38 @@ public class PieceRenderer{
 public class PuzzleRenderer{
     private GameObject boardBlock;
     private GameObject boardBlockBackground;
-    private GameObject[] pieceBlocks;
     private float gapPerBlockSize;
-    private GameObject spawnPoint;
 
-    public PuzzleRenderer(GameObject boardBlock, GameObject boardBlockBackground,
-        GameObject[] pieceBlocks, GameObject spawnPoint, float gapPerBlockSize) {
+    public PuzzleRenderer(GameObject boardBlock, GameObject boardBlockBackground, float gapPerBlockSize) {
         this.boardBlock = boardBlock;
         this.boardBlockBackground = boardBlockBackground;
-        this.pieceBlocks = pieceBlocks;
-        this.spawnPoint = spawnPoint;
         this.gapPerBlockSize = gapPerBlockSize;
     }
     public RenderedPuzzle render(List<List<Coordinate>> pieces, Vector3 centerPosition) {
         float distance = blockSize() * (1 + gapPerBlockSize);
         List<List<GameObject>> background = renderBlocks(pieces, centerPosition, distance, boardBlockBackground);
         List<List<GameObject>> board = renderBlocks(pieces, centerPosition, distance, boardBlock);
-        return new RenderedPuzzle(board, background);
+        List<List<BackgroundBlock>> backgroundBlocks = new List<List<BackgroundBlock>>();
+        foreach(List<GameObject> subList in background)
+        {
+            List<BackgroundBlock> temp = new List<BackgroundBlock>();
+            foreach(GameObject element in subList)
+            {
+                temp.Add(element.GetComponent<BackgroundBlock>());
+            }
+            backgroundBlocks.Add(temp);
+        }
+        List<List<Block>> boardBlocks = new List<List<Block>>();
+        foreach (List<GameObject> subList in board)
+        {
+            List<Block> temp = new List<Block>();
+            foreach (GameObject element in subList)
+            {
+                temp.Add(element.GetComponent<Block>());
+            }
+            boardBlocks.Add(temp);
+        }
+        return new RenderedPuzzle(boardBlocks, backgroundBlocks);
     }
     private List<List<GameObject>> renderBlocks(List<List<Coordinate>> pieces, Vector3 centerPosition, float distance, GameObject blockObject) {
         List<List<GameObject>> renderedBlocks = new List<List<GameObject>>();

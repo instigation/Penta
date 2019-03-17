@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PuzzleStageController : MonoBehaviour {
     public PuzzleSetRenderer __renderer;
@@ -17,11 +18,21 @@ public class PuzzleStageController : MonoBehaviour {
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
     private BonusCalculator bonusCalculator;
+    private float blockDestroyAnimationClipTimeInSecond;
 
     // Use this for initialization
     void Start () {
         setInput();
         setBonusCalculator();
+    }
+    private void setInput()
+    {
+        InputValidator workingspaceValidator = new EmptyValidator();
+        input = new MouseInputWrapper(__canvas, workingspaceValidator);
+    }
+    private void setBonusCalculator()
+    {
+        bonusCalculator = new BonusCalculator(__progressBar, __bonusText, __canvas);
     }
     void OnEnable()
     {
@@ -41,6 +52,7 @@ public class PuzzleStageController : MonoBehaviour {
         Puzzle p = generator.generatePuzzle();
         puzzleSet = __renderer.render(p);
         __controller.setPuzzleSet(puzzleSet);
+        blockDestroyAnimationClipTimeInSecond = puzzleSet.getDestroyAnimationTimeInSecond();
     }
     private int resolveNum() {
         return (int)resolve("num", 4);
@@ -53,14 +65,6 @@ public class PuzzleStageController : MonoBehaviour {
             return GlobalInformation.getValue(key);
         else
             return defaultForNoKey;
-    }
-    private void setInput() {
-        InputValidator workingspaceValidator = new EmptyValidator();
-        input = new MouseInputWrapper(__canvas, workingspaceValidator);
-    }
-    private void setBonusCalculator()
-    {
-        bonusCalculator = new BonusCalculator(__progressBar, __bonusText, __canvas);
     }
 
     // Update is called once per frame
@@ -78,13 +82,13 @@ public class PuzzleStageController : MonoBehaviour {
                 //only process the first touch
                 if (input.touchBegan())
                 {
-                    __controller.selectOnPosition(input.position(), __renderer.__gapBtwPieceBoxes / 2);
+                    __controller.selectOnPosition(input.anchoredPosition(), __renderer.__gapBtwPieceBoxes / 2);
                     __controller.tryToExtractSelected();
-                    __controller.moveSelectedTo(input.position());
+                    __controller.moveSelectedToAnchoredPosition(input.anchoredPosition());
                 }
                 else if (input.touchMoved())
                 {
-                    __controller.moveSelectedFor(input.deltaPosition());
+                    __controller.moveSelectedForAnchoredVector(input.deltaAnchoredPosition());
                 }
                 else if (input.touchEnded())
                 {
@@ -95,7 +99,7 @@ public class PuzzleStageController : MonoBehaviour {
                         bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
                         addTime(bonusCalculator.getBonusTime());
                         addScore(bonusCalculator.getBonusScore());
-                        bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedPosition());
+                        bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedAnchoredPosition());
                         if (puzzleSet.board.isSolved())
                             clearPuzzle();
                     }
@@ -202,10 +206,15 @@ public class PuzzleStageController : MonoBehaviour {
 
     private void clearPuzzle() {
         puzzleSet.destroy();
+        StartCoroutine(clearPuzzleAfterDestroy());
+    }
+    private IEnumerator clearPuzzleAfterDestroy()
+    {
+        yield return new WaitForSeconds(blockDestroyAnimationClipTimeInSecond);
         __progressBar.progressByOne();
         if (__progressBar.isEnded())
             __stageChanger.toStage(Stage.MENU);
-            // TODO: render skippable ad, revive, ...
+        // TODO: render skippable ad, revive, ...
         else
             renderPuzzle();
     }
