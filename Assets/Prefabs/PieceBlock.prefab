@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 114656672007147982}
   - component: {fileID: 5906777390277347203}
   - component: {fileID: 8437267463693541005}
+  - component: {fileID: 540577314959722413}
   m_Layer: 5
   m_Name: PieceBlock
   m_TagString: Untagged
@@ -105,5 +106,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8672d3ae03cde41119a9ddee476da09a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  __destroyAnimation: {fileID: 7400000, guid: 45cd725b46c964a64933510e9b538944, type: 2}
+--- !u!114 &540577314959722413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808914403975994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 524daa313ab7e4b29891b4061f3cdcd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

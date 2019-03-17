@@ -5,32 +5,17 @@ using UnityEngine.UI;
 
 public class Block : MonoBehaviour
 {
+    public AnimationClip __destroyAnimation;
     private Animator animator;
+    private Color originalColor;
     private bool isDisappearAnimationFinished = false;
 
     // Start is called before the first frame update
     void Start()
     {
         animator = GetComponent<Animator>();
-
-
         originalColor = getColor();
     }
-
-    public void playDisappearAnimation()
-    {
-        animator.SetTrigger("StageClear");
-    }
-    public bool isDisappearFinished() { return isDisappearAnimationFinished; }
-
-    private void onDisappearFinish()
-    {
-        isDisappearAnimationFinished = true;
-    }
-
-
-
-    private Color originalColor;
 
     public Vector2 getAnchoredPosition()
     {
@@ -65,8 +50,13 @@ public class Block : MonoBehaviour
     {
         gameObject.GetComponent<Image>().color = targetColor;
     }
+    public float getDestroyAnimationTimeInSecond()
+    {
+        return __destroyAnimation.length;
+    }
     public void destroy()
     {
-        Destroy(gameObject);
+        // the object will be destroyed on the end of animation due to animation event.
+        animator.SetTrigger("StageClear");
     }
 }

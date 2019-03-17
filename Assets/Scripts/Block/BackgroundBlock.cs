@@ -8,6 +8,9 @@ public class BackgroundBlock : Block {
     public void blink() {
         gameObject.GetComponent<Animator>().SetTrigger("blink");
     }
-
+    new public void destroy()
+    {
+        Destroy(gameObject);
+    }
 
 }
