@@ -14,6 +14,8 @@ public class PuzzleStageController : MonoBehaviour {
     public GameObject __bonusText;
     public StageChanger __stageChanger;
     public GameObject __gameOverPanel;
+    public GameObject __clearText;
+    public float clearTextTimeInSecond;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
@@ -37,10 +39,6 @@ public class PuzzleStageController : MonoBehaviour {
     void OnEnable()
     {
         startStage();
-    }
-    private void OnDisable()
-    {
-        endStage();
     }
     private void setAndroidLogger() {
         logger = new AndroidLogger();
@@ -213,10 +211,21 @@ public class PuzzleStageController : MonoBehaviour {
         yield return new WaitForSeconds(blockDestroyAnimationClipTimeInSecond);
         __progressBar.progressByOne();
         if (__progressBar.isEnded())
+        {
+            __timer.pause();
+            playClearText();
+            yield return new WaitForSeconds(clearTextTimeInSecond);
             __stageChanger.toStage(Stage.MENU);
-        // TODO: render skippable ad, revive, ...
+            // TODO: render skippable ad, revive, ...
+        }
         else
             renderPuzzle();
+        yield return null;
+    }
+    private void playClearText()
+    {
+        GameObject ret = Instantiate(__clearText);
+        ret.transform.SetParent(__canvas.transform, false);
     }
     private bool isGameOvered()
     {
@@ -231,16 +240,20 @@ public class PuzzleStageController : MonoBehaviour {
     }
     public void resetStage()
     {
-        endStage();
+        __gameOverPanel.SetActive(false);
+        // Refill is necessary to avoid reactivation of the panel due to time being zero.
+        __timer.refillTime();
+        __timer.pause();
+        puzzleSet.destroy();
+        StartCoroutine(resetStageAfterDestroy());
+    }
+    private IEnumerator resetStageAfterDestroy()
+    {
+        yield return new WaitForSeconds(blockDestroyAnimationClipTimeInSecond);
         __scoreChanger.reset();
         __progressBar.resetStage();
         __stageChanger.toStage(Stage.MENU);
-    }
-    public void endStage()
-    {
-        puzzleSet.destroy();
-        __timer.pause();
-        __gameOverPanel.SetActive(false);
+        yield return null;
     }
     public void startStage()
     {
