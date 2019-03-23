@@ -16,6 +16,7 @@ public class PuzzleStageController : MonoBehaviour {
     public GameObject __gameOverPanel;
     public GameObject __clearText;
     public GameObject __centerOfBoard;
+    public Camera __camera;
     public float clearTextTimeInSecond;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
@@ -31,7 +32,7 @@ public class PuzzleStageController : MonoBehaviour {
     private void setInput()
     {
         InputValidator workingspaceValidator = new EmptyValidator();
-        input = new MouseInputWrapper(__canvas, workingspaceValidator);
+        input = new MouseInputWrapper(__canvas, __camera, workingspaceValidator);
     }
     private void setBonusCalculator()
     {

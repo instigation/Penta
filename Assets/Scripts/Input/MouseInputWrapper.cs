@@ -20,12 +20,14 @@ public class MouseInputWrapper : GeneralInput {
     private state current = state.IDLE;
     private Vector3 mouseAnchoredPosition;
     private GameObject canvas;
+    private Camera camera;
     private InputValidator validator;
     private int lastTouchedFrame;
     private float deltaTouchTime;
 
-    public MouseInputWrapper(GameObject canvas, InputValidator validator) {
+    public MouseInputWrapper(GameObject canvas, Camera camera, InputValidator validator) {
         this.canvas = canvas;
+        this.camera = camera;
         this.validator = validator;
         this.lastTouchedFrame = -1000;
     }
@@ -71,7 +73,7 @@ public class MouseInputWrapper : GeneralInput {
         //mousePos.y *= canvasHeight;
         Vector2 mousePos;
         // TODO: Is canvas anchor and children anchors should be the same or something?
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.GetComponent<RectTransform>(), Input.mousePosition, null, out mousePos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.GetComponent<RectTransform>(), Input.mousePosition, camera, out mousePos);
         return mousePos;
     }
     public Vector2 deltaAnchoredPosition() {
