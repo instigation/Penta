@@ -53,7 +53,7 @@ public class PieceController : MonoBehaviour{
     public void moveSelectedToAnchoredPosition(Vector2 position)
     {
         if (selected != NONE)
-            candidates[selected].moveForAnchoredVector(position - candidates[selected].getOriginAnchoredPosition());
+            candidates[selected].moveForAnchoredVector(position - candidates[selected].getBottomAnchoredPosition());
     }
     private void select(int index) {
         selected = index;

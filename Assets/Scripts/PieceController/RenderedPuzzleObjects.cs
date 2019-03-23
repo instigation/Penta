@@ -37,21 +37,28 @@ public class StructuredPiece {
         Utils.centerToOrigin(coors);
         return getOriginAnchoredPosition();
     }
-    public Vector2 leftMostAnchoredPosition() {
-        Utils.leftMostToOrigin(coors);
-        return getOriginAnchoredPosition();
+    public Vector2 getBottomAnchoredPosition()
+    {
+        Coordinate centerBottomCoors = Utils.getCenterBottom(coors);
+        return getAnchoredPositionOf(centerBottomCoors);
     }
     // origin means (0,0) in coordinate
     public Vector2 getOriginAnchoredPosition() {
+        return getAnchoredPositionOf(new Coordinate(0, 0));
+    }
+    private Vector2 getAnchoredPositionOf(Coordinate coor)
+    {
         Vector2 defalutPosition = blocks[0].getAnchoredPosition();
         float x = defalutPosition.x, y = defalutPosition.y;
-        for (int i = 0; i < coors.Count; i++) {
-            if (coors[i].x == 0)
+        for (int i = 0; i < coors.Count; i++)
+        {
+            if (coors[i].x == coor.x)
                 x = blocks[i].getAnchoredPosition().x;
-            if (coors[i].y == 0)
+            if (coors[i].y == coor.y)
                 y = blocks[i].getAnchoredPosition().y;
         }
         return new Vector2(x, y);
+
     }
     public void rotateClockWiseAQuarterWithPivotAnchoredPosition(Vector2 pivotPosition) {
         Utils.rotateSetForTimes(coors, 1);
@@ -184,7 +191,6 @@ public class RenderedPiece : StructuredPiece{
 public class RenderedPuzzle {
     private List<List<Block>> board;
     private List<List<BackgroundBlock>> background;
-    private int blinkHash = Animator.StringToHash("blink");
     private List<List<bool>> isOccupied;
     private List<List<bool>> isHighlighted;
     private const float rangePerHalfBlockSize = 0.9999f;

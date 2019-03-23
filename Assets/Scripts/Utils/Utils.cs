@@ -92,6 +92,10 @@ namespace Penta
             {
                 return new Coordinate((min.x + max.x) / 2, max.y);
             }
+            public Coordinate centerBottom()
+            {
+                return new Coordinate((min.x + max.x) / 2, min.y);
+            }
             public int getWidth()
             {
                 return max.x - min.x + 1;
@@ -146,6 +150,11 @@ namespace Penta
             Coordinate leftMostPoint = envelope.leftMost();
             for (int i = 0; i < set.Count; i++)
                 set[i] -= leftMostPoint;
+        }
+        public static Coordinate getCenterBottom(List<Coordinate> set)
+        {
+            Envelope envelope = new Envelope(set);
+            return envelope.centerBottom();
         }
 
         public static void rotateRandomlySavingWidth(List<Coordinate> set)

@@ -18,6 +18,7 @@ public class PuzzleStageController : MonoBehaviour {
     public GameObject __centerOfBoard;
     public Camera __camera;
     public float clearTextTimeInSecond;
+    public Vector2 __offsetToMoveOnSelect;
     private AudioSource failSound;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
@@ -86,7 +87,7 @@ public class PuzzleStageController : MonoBehaviour {
                 {
                     __controller.selectOnPosition(input.anchoredPosition(), __renderer.__gapBtwPieceBoxes / 2);
                     __controller.tryToExtractSelected();
-                    __controller.moveSelectedToAnchoredPosition(input.anchoredPosition());
+                    __controller.moveSelectedToAnchoredPosition(input.anchoredPosition() + __offsetToMoveOnSelect);
                 }
                 else if (input.touchMoved())
                 {
