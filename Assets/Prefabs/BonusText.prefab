@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1970539067865663260}
   - component: {fileID: 4910188553090812826}
   - component: {fileID: 1925842798374851326}
-  - component: {fileID: 3877873595048235590}
   - component: {fileID: 8207236810263522757}
   m_Layer: 5
   m_Name: Score
@@ -81,25 +80,6 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: New Text
---- !u!95 &3877873595048235590
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1795534117829019863}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1797cb38d1f2a824cb57907954b0c0f1, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &8207236810263522757
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,7 +139,6 @@ GameObject:
   - component: {fileID: 4921940220558045172}
   - component: {fileID: 2020701232174535179}
   - component: {fileID: 3601452871525059018}
-  - component: {fileID: 7027436153276941443}
   - component: {fileID: 3125201813006618852}
   m_Layer: 5
   m_Name: Combo
@@ -229,25 +208,6 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: New Text
---- !u!95 &7027436153276941443
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5541854652403496837}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1797cb38d1f2a824cb57907954b0c0f1, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &3125201813006618852
 MonoBehaviour:
   m_ObjectHideFlags: 0

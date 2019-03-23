@@ -15,6 +15,7 @@ public class PuzzleStageController : MonoBehaviour {
     public StageChanger __stageChanger;
     public GameObject __gameOverPanel;
     public GameObject __clearText;
+    public GameObject __centerOfBoard;
     public float clearTextTimeInSecond;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
@@ -226,6 +227,7 @@ public class PuzzleStageController : MonoBehaviour {
     {
         GameObject ret = Instantiate(__clearText);
         ret.transform.SetParent(__canvas.transform, false);
+        UnityUtils.moveUIElementToPosition(ret, UnityUtils.getPositionOfUIElement(__centerOfBoard));
     }
     private bool isGameOvered()
     {

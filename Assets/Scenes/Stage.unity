@@ -1980,6 +1980,7 @@ MonoBehaviour:
   __gameOverPanel: {fileID: 1561521715}
   __clearText: {fileID: 4078823601623609334, guid: 7208d799239c241b9a9d8736581db957,
     type: 3}
+  __centerOfBoard: {fileID: 1713106974}
   clearTextTimeInSecond: 1
 --- !u!4 &991601166
 Transform:
@@ -2652,7 +2653,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 295, y: 515}
+  m_AnchoredPosition: {x: 295, y: 519}
   m_SizeDelta: {x: 1080, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1554361752
