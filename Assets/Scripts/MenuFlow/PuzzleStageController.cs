@@ -18,6 +18,7 @@ public class PuzzleStageController : MonoBehaviour {
     public GameObject __centerOfBoard;
     public Camera __camera;
     public float clearTextTimeInSecond;
+    private AudioSource failSound;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private AndroidLogger logger;
@@ -28,6 +29,7 @@ public class PuzzleStageController : MonoBehaviour {
     void Start () {
         setInput();
         setBonusCalculator();
+        failSound = gameObject.GetComponent<AudioSource>();
     }
     private void setInput()
     {
@@ -102,6 +104,8 @@ public class PuzzleStageController : MonoBehaviour {
                         bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedAnchoredPosition());
                         if (puzzleSet.board.isSolved())
                             clearPuzzle();
+                        if (insertionResult == InsertionResult.WRONG)
+                            failSound.Play();
                     }
                     __controller.unSelect();
                 }

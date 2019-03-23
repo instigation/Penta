@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum Stage { MENU, PUZZLE, SETTING, LEADERBOARD };
 
@@ -31,10 +32,25 @@ public class StageChanger : MonoBehaviour
     }
     private void setGameObjectsWithStage(Stage stage, bool isActive)
     {
+        // Unity official best practice says I should disable CanvasRenderer.
+        // But unlike Renderer, CanvasRenderer has no enabled property.
+        // Also, adjusting alpha don't work because hovering the cursor reveals the hidden object.
+        // So just used localScale method instead.
         foreach(GameObject obj in allGameObjects)
         {
             if (obj.tag == correspondingTags[(int)stage])
-               obj.SetActive(isActive);
+            {
+                RectTransform rectTransform = obj.GetComponent<RectTransform>();
+                if (rectTransform != null)
+                {
+                    rectTransform.localScale = isActive ? new Vector3(1,1,1) : new Vector3(0,0,0);
+                }
+                else
+                {
+                    obj.SetActive(isActive);
+                }
+
+            }
         }
     }
     private void setAds(Stage stage)
