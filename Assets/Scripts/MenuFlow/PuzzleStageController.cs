@@ -177,7 +177,7 @@ public class PuzzleStageController : MonoBehaviour {
         }
         public int getBonusScore()
         {
-            return isCorrectInsertionOccured ? progressBar.getStage() * (streak + 1) : 0;//(combo + streak + 1) : 0;
+            return isCorrectInsertionOccured ? progressBar.getStage() * (streak + 1) : 0;
         }
         public void playBonusText(Vector2 position)
         {

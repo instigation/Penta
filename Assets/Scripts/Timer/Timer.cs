@@ -27,6 +27,7 @@ public class Timer : MonoBehaviour
     private readonly float audioSourceDelay = 1.0F;
     private float timeAfterPlayedAudioSourceInSecond = 0.0F;
     private bool inAudioSourceDelay = false;
+    private float timeToChangeInSecond = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -56,20 +57,30 @@ public class Timer : MonoBehaviour
 
     public void manuallyChangeTime(float second)
     {
-        StartCoroutine(manuallyChangeTimeCoroutine(second));
+        const float epsilon = 0.02f;
+        if (timeToChangeInSecond >= epsilon)
+        {
+            timeToChangeInSecond += second;
+        }
+        else
+            StartCoroutine(manuallyChangeTimeCoroutine(second));
     }
 
     public IEnumerator manuallyChangeTimeCoroutine(float second)
     {
         float timeChangeSpeedFactor = second / timeChangeDurationInSecond;
-        while(second > deltaTime*timeChangeSpeedFactor)
+        timeToChangeInSecond = second;
+        while(timeToChangeInSecond > deltaTime*timeChangeSpeedFactor)
         {
             changeTime(deltaTime*timeChangeSpeedFactor);
-            second -= deltaTime*timeChangeSpeedFactor;
+            timeToChangeInSecond -= deltaTime*timeChangeSpeedFactor;
             yield return null;
         }
-        if (second >= 0)
-            changeTime(second);
+        if (timeToChangeInSecond >= 0)
+        {
+            changeTime(timeToChangeInSecond);
+            timeToChangeInSecond = 0.0f;
+        }
         else
             Debug.Log("timeLeftNegativeError");
         yield return null;

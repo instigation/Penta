@@ -7,6 +7,7 @@ public class ScoreChanger : MonoBehaviour{
     public GameObject __scoreObject;
     public GameObject __bestScoreObject;
     private int bestScore;
+    private int scoreToChange = 0;
 
     public void Start()
     {
@@ -22,16 +23,23 @@ public class ScoreChanger : MonoBehaviour{
     }
     public void changeGradually(int amount)
     {
-        StartCoroutine(changeGraduallyCoroutine(amount));
+        if (scoreToChange > 0)
+            scoreToChange += amount;
+        else
+            StartCoroutine(changeGraduallyCoroutine(amount));
     }
     private IEnumerator changeGraduallyCoroutine(int amount) {
-        int originalScore = getScore();
-        for(int score = originalScore; score <= originalScore + amount; score++) {
+        scoreToChange = amount;
+        int score = getScore();
+        while (scoreToChange > 0)
+        {
+            score++;
             setScore(score);
-            if(score > bestScore)
+            if (score > bestScore)
             {
                 setBestScore(score);
             }
+            scoreToChange--;
             yield return null;
         }
         GlobalInformation.storeKeyValue("bestScore", bestScore);
