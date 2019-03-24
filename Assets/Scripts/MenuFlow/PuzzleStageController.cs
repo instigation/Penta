@@ -22,7 +22,6 @@ public class PuzzleStageController : MonoBehaviour {
     private AudioSource failSound;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
-    private AndroidLogger logger;
     private BonusCalculator bonusCalculator;
     private float blockDestroyAnimationClipTimeInSecond;
 
@@ -44,9 +43,6 @@ public class PuzzleStageController : MonoBehaviour {
     void OnEnable()
     {
         startStage();
-    }
-    private void setAndroidLogger() {
-        logger = new AndroidLogger();
     }
     private void renderPuzzle() {
         int num = resolveNum();
@@ -117,12 +113,10 @@ public class PuzzleStageController : MonoBehaviour {
 
     private class BonusCalculator
     {
-        private float lastCorrectInsertionTime;
         private bool isLastInsertionCorrect;
         private bool isStreakOccured;
         private bool isCorrectInsertionOccured;
         private int streak;
-        //private int combo;
         private ProgressBar progressBar;
         private GameObject bonusText;
         private GameObject canvas;
@@ -130,7 +124,6 @@ public class PuzzleStageController : MonoBehaviour {
         public BonusCalculator(ProgressBar progressBar, GameObject bonusText, GameObject canvas)
         {
             isLastInsertionCorrect = false;
-            lastCorrectInsertionTime = float.NegativeInfinity;
             isStreakOccured = false;
             isCorrectInsertionOccured = false;
             streak = 0;
@@ -152,12 +145,7 @@ public class PuzzleStageController : MonoBehaviour {
                     }
                     else
                         isStreakOccured = false;
-                    /* if (currentStageTime - lastCorrectInsertionTime <= 2.0f)
-                         combo++;
-                     else
-                         combo = 0; */
                     isLastInsertionCorrect = true;
-                    lastCorrectInsertionTime = currentStageTime;
                     break;
                 case InsertionResult.WRONG:
                     isCorrectInsertionOccured = false;

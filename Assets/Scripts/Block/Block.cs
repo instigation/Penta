@@ -8,7 +8,6 @@ public class Block : MonoBehaviour
     public AnimationClip __destroyAnimation;
     private Animator animator;
     private Color originalColor;
-    private bool isDisappearAnimationFinished = false;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +21,7 @@ public class Block : MonoBehaviour
         return gameObject.GetComponent<RectTransform>().anchoredPosition;
     }
     public void moveToAnchoredPosition(Vector2 targetPosition)
-    {
+    { 
         gameObject.GetComponent<RectTransform>().anchoredPosition = targetPosition;
     }
     public void moveForAnchoredVector(Vector2 deltaPosition)

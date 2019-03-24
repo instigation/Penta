@@ -689,7 +689,8 @@ PlayerSettings:
     daydream:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
-  cloudServicesEnabled: {}
+  cloudServicesEnabled:
+    UNet: 1
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -709,10 +710,10 @@ PlayerSettings:
   facebookXfbml: 0
   facebookFrictionlessRequests: 1
   apiCompatibilityLevel: 2
-  cloudProjectId: 
+  cloudProjectId: ccb7b03f-d075-4fef-9f5e-f3e5618d1309
   framebufferDepthMemorylessMode: 0
-  projectName: 
-  organizationId: 
+  projectName: Penta
+  organizationId: dongseong-9481b6ae-b889-4696-9a61-78675715d743
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0

@@ -6,7 +6,7 @@ public class BackgroundBlock : Block {
     private int blinkHash = Animator.StringToHash("blink");
 
     public void blink() {
-        gameObject.GetComponent<Animator>().SetTrigger("blink");
+        gameObject.GetComponent<Animator>().SetTrigger(blinkHash);
     }
     new public void destroy()
     {

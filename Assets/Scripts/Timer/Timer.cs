@@ -46,8 +46,8 @@ public class Timer : MonoBehaviour
         {
             deltaTime = Time.deltaTime;
             changeTime(-deltaTime);
+            playAudioSourceIfNotMuchTimeLeft();
         }
-        playAudioSourceIfNotMuchTimeLeft();
     }
 
     public void refillTime()
@@ -150,7 +150,7 @@ public class Timer : MonoBehaviour
         if (inAudioSourceDelay)
         {
             timeAfterPlayedAudioSourceInSecond += deltaTime;
-            if (timeAfterPlayedAudioSourceInSecond >= 1.0F)
+            if (timeAfterPlayedAudioSourceInSecond >= audioSourceDelay)
             {
                 timeAfterPlayedAudioSourceInSecond = 0.0F;
                 inAudioSourceDelay = false;

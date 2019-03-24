@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Penta;
 
 public enum Stage { MENU, PUZZLE, SETTING, LEADERBOARD };
 
@@ -19,7 +20,6 @@ public class StageChanger : MonoBehaviour
         setGameObjectsWithStage(Stage.SETTING, false);
         setGameObjectsWithStage(Stage.LEADERBOARD, false);
         setGameObjectsWithStage(Stage.MENU, true);
-        adManager.requestBanner();
     }
     // Update is called once per frame
     void Update()
