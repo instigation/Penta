@@ -15,6 +15,10 @@ public class StageChanger : MonoBehaviour
     void Awake()
     {
         currentStage = Stage.MENU;
+        setGameObjectsWithStage(Stage.PUZZLE, false);
+        setGameObjectsWithStage(Stage.SETTING, false);
+        setGameObjectsWithStage(Stage.LEADERBOARD, false);
+        setGameObjectsWithStage(Stage.MENU, true);
         adManager.requestBanner();
     }
     // Update is called once per frame

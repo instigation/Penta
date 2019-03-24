@@ -268,6 +268,7 @@ public class PuzzleStageController : MonoBehaviour {
         // progressByOne과 setBonusCalculator의 순서는 중요한데, bonus calculator가 stage number에 영향받기 때문
         __progressBar.progressByOne();
         setBonusCalculator();
+        Debug.Log("render puzzle");
         renderPuzzle();
 
         __gameOverPanel.SetActive(false);

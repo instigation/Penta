@@ -12,8 +12,8 @@ public class ProgressBar : MonoBehaviour
     // progressByOne: start->1->2->end->start->...
     private int stage;
     private int subStage;
-    private Transform slider;
-    private Transform text;
+    public Transform __slider;
+    public Transform __text;
     public Texture[] __progressImages;
     // Start is called before the first frame update
     void Start()
@@ -30,8 +30,6 @@ public class ProgressBar : MonoBehaviour
             subStage = 3;
             GlobalInformation.storeKeyValue("subStage", subStage);
         }
-        slider = gameObject.transform.GetChild(1);
-        text = gameObject.transform.GetChild(2);
         updateTextAndBar();
     }
     public bool isEnded()
@@ -72,7 +70,7 @@ public class ProgressBar : MonoBehaviour
     }
     private void updateTextAndBar()
     {
-        text.GetComponent<Text>().text = stage.ToString();
-        slider.GetComponent<RawImage>().texture = __progressImages[subStage];
+        __text.GetComponent<Text>().text = stage.ToString();
+        __slider.GetComponent<RawImage>().texture = __progressImages[subStage];
     }
 }
