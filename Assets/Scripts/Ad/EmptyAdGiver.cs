@@ -9,11 +9,15 @@ public class EmptyAdGiver : IAdGiver
     {
         this.puzzleStageController = puzzleStageController;
     }
-    public void requestBanner() { }
     public void hideBanner() { }
     public void showBanner() { }
-    public void showIfLoaded() { }
-    public void userOptToWatchReviveAd() {
+    public void showInterstitialIfLoaded() { }
+    public void showRewardBasedVideoIfLoaded()
+    {
         puzzleStageController.reviveStage();
+    }
+    public double latestAdClosedTimeFromStartInSeconds()
+    {
+        return 0;
     }
 }

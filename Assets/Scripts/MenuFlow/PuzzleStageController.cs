@@ -21,11 +21,13 @@ public class PuzzleStageController : MonoBehaviour {
     public Camera __camera;
     public float clearTextTimeInSecond;
     public Vector2 __offsetToMoveOnSelect;
+    public AdManager __adManager;
     private AudioSource failSound;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
     private BonusCalculator bonusCalculator;
     private float blockDestroyAnimationClipTimeInSecond;
+    private bool isRevived = false;
 
     // Use this for initialization
     void Start () {
@@ -73,7 +75,10 @@ public class PuzzleStageController : MonoBehaviour {
     {
         if (isGameOvered())
         {
-            pauseStage();
+            if (isRevived)
+                resetStage();
+            else
+                pauseStage();
         }
         else
         {
@@ -95,9 +100,8 @@ public class PuzzleStageController : MonoBehaviour {
                 {
                     if (__controller.tryToInsertSelected())
                     {
-                        float currentStageTime = __timer.getCurrentStageTime();
                         InsertionResult insertionResult = puzzleSet.board.lastInsertionResult();
-                        bonusCalculator.calculateOnInsertion(insertionResult, currentStageTime);
+                        bonusCalculator.calculateOnInsertion(insertionResult);
                         addTime(bonusCalculator.getBonusTime());
                         addScore(bonusCalculator.getBonusScore());
                         bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedAnchoredPosition());
@@ -139,7 +143,7 @@ public class PuzzleStageController : MonoBehaviour {
             this.specialParticle = specialParticle;
             this.canvas = canvas;
         }
-        public void calculateOnInsertion(InsertionResult insertionResult, float currentStageTime)
+        public void calculateOnInsertion(InsertionResult insertionResult)
         {
             switch (insertionResult)
             {
@@ -232,6 +236,7 @@ public class PuzzleStageController : MonoBehaviour {
             __timer.pause();
             playClearText();
             yield return new WaitForSeconds(clearTextTimeInSecond);
+            __adManager.showInterstitialIfLoadedAndNotTooFrequent();
             __stageChanger.toStage(Stage.MENU);
             // TODO: render skippable ad, revive, ...
         }
@@ -260,8 +265,8 @@ public class PuzzleStageController : MonoBehaviour {
     {
         __gameOverPanel.SetActive(false);
         // Refill is necessary to avoid reactivation of the panel due to time being zero.
-        __timer.refillTime();
         __timer.pause();
+        __timer.refillTime();
         puzzleSet.destroy();
         StartCoroutine(resetStageAfterDestroy());
     }
@@ -278,12 +283,12 @@ public class PuzzleStageController : MonoBehaviour {
         // progressByOne과 setBonusCalculator의 순서는 중요한데, bonus calculator가 stage number에 영향받기 때문
         __progressBar.progressByOne();
         setBonusCalculator();
-        Debug.Log("render puzzle");
         renderPuzzle();
 
         __gameOverPanel.SetActive(false);
         __timer.refillTime();
         __timer.run();
+        isRevived = false;
     }
     public void pauseStage()
     {
@@ -295,5 +300,6 @@ public class PuzzleStageController : MonoBehaviour {
         __gameOverPanel.SetActive(false);
         __timer.refillTime();
         __timer.run();
+        isRevived = true;
     }
 }

@@ -3,10 +3,11 @@ namespace Penta
 {
     public interface IAdGiver
     {
-        void requestBanner();
         void hideBanner();
         void showBanner();
-        void showIfLoaded();
-        void userOptToWatchReviveAd();
+        void showInterstitialIfLoaded();
+        void showRewardBasedVideoIfLoaded();
+        // Gives 0 if Ad never occured after the start.
+        double latestAdClosedTimeFromStartInSeconds();
     }
 }

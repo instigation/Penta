@@ -86,11 +86,6 @@ public class Timer : MonoBehaviour
         yield return null;
     }
 
-    public float getCurrentStageTime()
-    {
-        return Time.fixedTime;
-    }
-
     public float getLeftoverTimeInSecond()
     {
         return leftoverTimeInSecond;

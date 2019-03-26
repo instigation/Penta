@@ -358,7 +358,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 494708596}
-        m_MethodName: showIfLoaded
+        m_MethodName: showInterstitialIfLoadedAndNotTooFrequent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2492,7 +2492,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 494708596}
-        m_MethodName: userOptToWatchReviveAd
+        m_MethodName: showRewardBasedVideoIfLoaded
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2669,6 +2669,7 @@ MonoBehaviour:
   __camera: {fileID: 395279293}
   clearTextTimeInSecond: 1
   __offsetToMoveOnSelect: {x: 0, y: 100}
+  __adManager: {fileID: 494708596}
 --- !u!4 &991601166
 Transform:
   m_ObjectHideFlags: 0
@@ -3950,7 +3951,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Restart
+  m_Text: No thanks
 --- !u!222 &1426075937
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4049,7 +4050,7 @@ RectTransform:
   m_GameObject: {fileID: 1554361747}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 90}
-  m_LocalScale: {x: 0.00436109, y: 0.00436109, z: 0.00436109}
+  m_LocalScale: {x: 0.0041591385, y: 0.0041591385, z: 0.0041591385}
   m_Children:
   - {fileID: 1961359021}
   - {fileID: 1111191359}
