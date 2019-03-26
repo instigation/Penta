@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class PuzzleStageController : MonoBehaviour {
+    public GameObject __normalParticle;
+    public GameObject __specialParticle;
     public PuzzleSetRenderer __renderer;
     public PieceController __controller;
     public GameObject __canvas;
@@ -38,7 +40,7 @@ public class PuzzleStageController : MonoBehaviour {
     }
     private void setBonusCalculator()
     {
-        bonusCalculator = new BonusCalculator(__progressBar, __bonusText, __canvas);
+        bonusCalculator = new BonusCalculator(__progressBar, __bonusText, __normalParticle, __specialParticle, __canvas);
     }
     void OnEnable()
     {
@@ -99,6 +101,7 @@ public class PuzzleStageController : MonoBehaviour {
                         addTime(bonusCalculator.getBonusTime());
                         addScore(bonusCalculator.getBonusScore());
                         bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedAnchoredPosition());
+                        bonusCalculator.playBonusParticle(puzzleSet.board.topOfLastInsertedAnchoredPosition());
                         if (puzzleSet.board.isSolved())
                             clearPuzzle();
                         if (insertionResult == InsertionResult.WRONG)
@@ -119,9 +122,11 @@ public class PuzzleStageController : MonoBehaviour {
         private int streak;
         private ProgressBar progressBar;
         private GameObject bonusText;
+        private GameObject normalParticle;
+        private GameObject specialParticle;
         private GameObject canvas;
 
-        public BonusCalculator(ProgressBar progressBar, GameObject bonusText, GameObject canvas)
+        public BonusCalculator(ProgressBar progressBar, GameObject bonusText, GameObject normalParticle, GameObject specialParticle, GameObject canvas)
         {
             isLastInsertionCorrect = false;
             isStreakOccured = false;
@@ -130,6 +135,8 @@ public class PuzzleStageController : MonoBehaviour {
             //combo = 0;
             this.progressBar = progressBar;
             this.bonusText = bonusText;
+            this.normalParticle = normalParticle;
+            this.specialParticle = specialParticle;
             this.canvas = canvas;
         }
         public void calculateOnInsertion(InsertionResult insertionResult, float currentStageTime)
@@ -193,6 +200,21 @@ public class PuzzleStageController : MonoBehaviour {
         {
             string ret = "+" + getBonusScore().ToString();
             return ret;
+        }
+        public void playBonusParticle(Vector2 position)
+        {
+            if (isCorrectInsertionOccured)
+            {
+                if ((streak % 5 == 0) && (streak > 0))
+                    playParticle(specialParticle, position);
+                else
+                    playParticle(normalParticle, position);
+            }
+        }
+        private void playParticle(GameObject particle, Vector2 position)
+        {
+            UnityUtils.moveUIElementToPosition(particle, position);
+            particle.GetComponent<ParticleSystem>().Play();
         }
     }
 
