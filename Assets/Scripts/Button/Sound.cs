@@ -9,7 +9,7 @@ public class Sound : MonoBehaviour
     public AudioMixer __masterMixer;
     public Sprite __turnOnImage;
     public Sprite __turnOffImage;
-    public readonly float originalVolume = -20;
+    public readonly float originalVolume = 0;
     private bool isMuted;
 
     // Start is called before the first frame update
