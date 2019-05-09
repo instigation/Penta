@@ -11,14 +11,15 @@ public class ScoreChanger : MonoBehaviour{
 
     public void Start()
     {
-        int score = (int)GlobalInformation.getOrInitValue("score", 0);
+        int score = GlobalInformation.getOrInitInt("score", 0);
         setScore(score);
-        bestScore = (int)GlobalInformation.getOrInitValue("bestScore", 0);
+        bestScore = GlobalInformation.getOrInitInt("bestScore", 0);
         setBestScore(bestScore);
     }
 
     public void reset()
     {
+        GlobalInformation.setInt("score", 0);
         setScore(0);
     }
     public void changeGradually(int amount)
@@ -42,7 +43,8 @@ public class ScoreChanger : MonoBehaviour{
             scoreToChange--;
             yield return null;
         }
-        GlobalInformation.storeKeyValue("bestScore", bestScore);
+        GlobalInformation.setInt("score", score);
+        GlobalInformation.setInt("bestScore", bestScore);
         yield return null;
     }
 

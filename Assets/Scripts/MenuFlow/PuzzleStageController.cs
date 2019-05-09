@@ -58,16 +58,17 @@ public class PuzzleStageController : MonoBehaviour {
         blockDestroyAnimationClipTimeInSecond = puzzleSet.getDestroyAnimationTimeInSecond();
     }
     private int resolveNum() {
-        return (int)resolve("num", 4);
-    }
-    private Difficulty resolveDifficulty() {
-        return (Difficulty)resolve("difficulty", Difficulty.HARD);
-    }
-    private object resolve(object key, object defaultForNoKey) {
-        if (GlobalInformation.contains(key))
-            return GlobalInformation.getValue(key);
+        if (GlobalInformation.hasKey("num"))
+            return GlobalInformation.getInt("num");
         else
-            return defaultForNoKey;
+            return 4;
+    }
+    private Difficulty resolveDifficulty()
+    {
+        if (GlobalInformation.hasKey("difficulty"))
+            return (Difficulty)GlobalInformation.getInt("difficulty");
+        else
+            return Difficulty.HARD;
     }
 
     // Update is called once per frame
