@@ -18,18 +18,8 @@ public class ProgressBar : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (GlobalInformation.hasKey("stage"))
-        {
-            stage = GlobalInformation.getInt("stage");
-            subStage = GlobalInformation.getInt("subStage");
-        }
-        else
-        {
-            stage = 0;
-            GlobalInformation.setInt("stage", stage);
-            subStage = 3;
-            GlobalInformation.setInt("subStage", subStage);
-        }
+        stage = GlobalInformation.getOrInitInt("stage", stage);
+        subStage = 3;
         updateTextAndBar();
     }
     public bool isEnded()
@@ -47,7 +37,7 @@ public class ProgressBar : MonoBehaviour
             advanceSubStage();
         }
     }
-    public void resetStage()
+    public void resetCurrentStage()
     {
         subStage = 3;
         stage--;
@@ -67,6 +57,8 @@ public class ProgressBar : MonoBehaviour
     {
         subStage += 1;
         updateTextAndBar();
+        if (isEnded())
+            GlobalInformation.setInt("stage", stage);
     }
     private void updateTextAndBar()
     {

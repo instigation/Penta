@@ -33,7 +33,6 @@ public static class LocalCryptography
                 }
             }
         }
-        Debug.Log("Encryption result!:" + Convert.ToBase64String(encrypted));
         return Convert.ToBase64String(encrypted);
     }
     public static string decrypt(string cipherText)

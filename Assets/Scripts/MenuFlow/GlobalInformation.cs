@@ -4,7 +4,8 @@ using UnityEngine;
 public static class GlobalInformation {
     public static void setInt(string key, int value)
     {
-        PlayerPrefs.SetInt(key, value);
+        ;
+        PlayerPrefs.SetString(key, LocalCryptography.encrypt(value.ToString()));
     }
     public static void setString(string key, string value)
     {
@@ -16,7 +17,7 @@ public static class GlobalInformation {
     }
     public static int getInt(string key)
     {
-        return PlayerPrefs.GetInt(key);
+        return System.Convert.ToInt32(LocalCryptography.decrypt(PlayerPrefs.GetString(key)));
     }
     public static string getString(string key)
     {

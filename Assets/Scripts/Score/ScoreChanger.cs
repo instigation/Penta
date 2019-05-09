@@ -8,27 +8,39 @@ public class ScoreChanger : MonoBehaviour{
     public GameObject __bestScoreObject;
     private int bestScore;
     private int scoreToChange = 0;
+    private int trueScore; // When score rising animation is being played, presented score is different from the true score.
 
     public void Start()
     {
-        int score = GlobalInformation.getOrInitInt("score", 0);
-        setScore(score);
+        trueScore = GlobalInformation.getOrInitInt("score", 0);
+        setScore(trueScore);
         bestScore = GlobalInformation.getOrInitInt("bestScore", 0);
         setBestScore(bestScore);
     }
 
-    public void reset()
+    public void resetAndSave()
     {
+        trueScore = 0;
         GlobalInformation.setInt("score", 0);
         setScore(0);
     }
     public void changeGradually(int amount)
     {
+        trueScore += amount;
         if (scoreToChange > 0)
             scoreToChange += amount;
         else
             StartCoroutine(changeGraduallyCoroutine(amount));
     }
+    public void saveScore()
+    {
+        GlobalInformation.setInt("score", trueScore);
+    }
+    public static void setSavedScoreToZero()
+    {
+        GlobalInformation.setInt("score", 0);
+    }
+
     private IEnumerator changeGraduallyCoroutine(int amount) {
         scoreToChange = amount;
         int score = getScore();
@@ -43,11 +55,9 @@ public class ScoreChanger : MonoBehaviour{
             scoreToChange--;
             yield return null;
         }
-        GlobalInformation.setInt("score", score);
         GlobalInformation.setInt("bestScore", bestScore);
         yield return null;
     }
-
     private int getScore() {
         // 형식이 안맞거나 32를 넘으면 위험할 수도
         string score = __scoreObject.GetComponent<Text>().text;

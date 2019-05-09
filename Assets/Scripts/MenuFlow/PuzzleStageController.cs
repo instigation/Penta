@@ -234,12 +234,13 @@ public class PuzzleStageController : MonoBehaviour {
         __progressBar.progressByOne();
         if (__progressBar.isEnded())
         {
+            // saving score is important, so should be executed first.
+            __scoreChanger.saveScore();
             __timer.pause();
             playClearText();
             yield return new WaitForSeconds(clearTextTimeInSecond);
             __adManager.showInterstitialIfLoadedAndNotTooFrequent();
             __stageChanger.toStage(Stage.MENU);
-            // TODO: render skippable ad, revive, ...
         }
         else
             renderPuzzle();
@@ -274,13 +275,14 @@ public class PuzzleStageController : MonoBehaviour {
     private IEnumerator resetStageAfterDestroy()
     {
         yield return new WaitForSeconds(blockDestroyAnimationClipTimeInSecond);
-        __scoreChanger.reset();
-        __progressBar.resetStage();
+        __scoreChanger.resetAndSave();
+        __progressBar.resetCurrentStage();
         __stageChanger.toStage(Stage.MENU);
         yield return null;
     }
     public void startStage()
     {
+        ScoreChanger.setSavedScoreToZero(); // To make score zero when player terminates during the stage. The score is overwritten on puzzle clear.
         // progressByOne과 setBonusCalculator의 순서는 중요한데, bonus calculator가 stage number에 영향받기 때문
         __progressBar.progressByOne();
         setBonusCalculator();
