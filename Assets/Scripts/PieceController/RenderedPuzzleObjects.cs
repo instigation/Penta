@@ -197,6 +197,7 @@ public class RenderedPuzzle {
     private bool recentInsertionSuccess;
     private InsertionResult recentInsertionResult;
     private BoardComparer lastInsertionComparer;
+    private Color highlightColor = Color.green;
 
     // precondition: board is aligned as List of pieces. That is, List of List of GameObject = List of pieces.
     public RenderedPuzzle(List<List<Block>> board, List<List<BackgroundBlock>> background) {
@@ -276,7 +277,7 @@ public class RenderedPuzzle {
     {
         foreach (Coordinate index in indexes)
         {
-            board[index.x][index.y].setColor(Color.green);
+            board[index.x][index.y].setColor(highlightColor);
         }
     }
     public void resetBlockColors()

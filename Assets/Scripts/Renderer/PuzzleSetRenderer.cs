@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Penta;
+using System;
 
 public class PuzzleSetRenderer : MonoBehaviour {
     /// <summary>
@@ -17,6 +19,7 @@ public class PuzzleSetRenderer : MonoBehaviour {
     // piece box means The 4x4 box covering the piece. 
     // It is always 4x4 because the envelope of the piece could be 4x2,3x3,2x4.
     public float __gapBtwPieceBoxes;
+    public Color[] __pieceColors;
     private readonly bool __randomizeRotation = false;
     private Vector3 spawnOriginPosition;
 
@@ -36,13 +39,16 @@ public class PuzzleSetRenderer : MonoBehaviour {
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
         List<RenderedPiece> ret = new List<RenderedPiece>();
         spawnOriginPosition = UnityUtils.getPositionOfUIElement(__candidateLeftTopBlockSpawnPoint);
+        Color[] pieceColors = new Color[__pieceColors.Length];
+        Array.Copy(__pieceColors, pieceColors, __pieceColors.Length);
+        pieceColors.Shuffle();
         for (int i = 0; i < piecesInCoordinate.Count; i++) {
             List<Coordinate> pieceInCoordinate = piecesInCoordinate[i];
             if (__randomizeRotation)
                 Utils.rotateRandomlySavingWidth(pieceInCoordinate);
             Utils.leftTopToOrigin(pieceInCoordinate);
             PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __gapPerBlockSize);
-            RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnOriginPosition);
+            RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnOriginPosition, pieceColors[i]);
             if (i == 2)
             {
                 spawnOriginPosition.y -= 4 * UnityUtils.getWidthOfUIElement(__pieceBlocks[0]) + __gapBtwPieceBoxes;
@@ -77,20 +83,23 @@ public class PieceRenderer{
         this.pieceBlock = pieceBlock;
         this.gapPerBlockSize = gapPerBlockSize;
     }
-    public RenderedPiece render(List<Coordinate> blocks, Vector3 originPosition) {
-        return renderBlocksAtOrigin(blocks, originPosition);
+    public RenderedPiece render(List<Coordinate> blocks, Vector3 originPosition, Color pieceColor) {
+        return renderBlocksAtOrigin(blocks, originPosition, pieceColor);
     }
-    private RenderedPiece renderBlocksAtOrigin(List<Coordinate> blocks, Vector3 originPosition) {
+    private RenderedPiece renderBlocksAtOrigin(List<Coordinate> blocks, Vector3 originPosition, Color pieceColor) {
         ///<remarks>
         /// origin means (0,0) in Coordinates
         ///</remarks>
         List<Block> renderedBlocks = new List<Block>();
         float distance = blockSize() * (1 + gapPerBlockSize);
+        Color originalColor = pieceBlock.GetComponent<Image>().color;
+        pieceBlock.GetComponent<Image>().color = pieceColor;
         foreach (Coordinate block in blocks) {
             Vector3 position = originPosition + UnityUtils.toVector3(block) * distance;
             Block renderedBlock = renderOneBlockAt(position).GetComponent<Block>();
             renderedBlocks.Add(renderedBlock);
         }
+        pieceBlock.GetComponent<Image>().color = originalColor;
         return new RenderedPiece(renderedBlocks, blocks);
     }
     private float blockSize() {

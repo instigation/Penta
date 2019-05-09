@@ -1768,6 +1768,11 @@ MonoBehaviour:
   __centerOfBoard: {fileID: 1713106974}
   __candidateLeftTopBlockSpawnPoint: {fileID: 1263188777}
   __gapBtwPieceBoxes: 75
+  __pieceColors:
+  - {r: 0.9245283, g: 0.44918123, b: 0.44918123, a: 1}
+  - {r: 0.8773585, g: 0.86349994, b: 0.4014329, a: 1}
+  - {r: 0.40143287, g: 0.9150943, b: 0.47430333, a: 1}
+  - {r: 0.43454075, g: 0.7677419, b: 0.8773585, a: 1}
 --- !u!4 &562352064
 Transform:
   m_ObjectHideFlags: 0
