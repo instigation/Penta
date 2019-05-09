@@ -226,6 +226,7 @@ public class PuzzleStageController : MonoBehaviour {
 
     private void clearPuzzle() {
         puzzleSet.destroy();
+        __timer.pause();
         StartCoroutine(clearPuzzleAfterDestroy());
     }
     private IEnumerator clearPuzzleAfterDestroy()
@@ -236,14 +237,17 @@ public class PuzzleStageController : MonoBehaviour {
         {
             // saving score is important, so should be executed first.
             __scoreChanger.saveScore();
-            __timer.pause();
             playClearText();
             yield return new WaitForSeconds(clearTextTimeInSecond);
             __adManager.showInterstitialIfLoadedAndNotTooFrequent();
             __stageChanger.toStage(Stage.MENU);
         }
         else
+        {
             renderPuzzle();
+            yield return new WaitForSeconds(blockDestroyAnimationClipTimeInSecond); // Assume that (puzzle render time) equals (destory time).
+            __timer.run();
+        }
         yield return null;
     }
     private void playClearText()
