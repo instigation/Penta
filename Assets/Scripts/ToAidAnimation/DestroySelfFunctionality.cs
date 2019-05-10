@@ -25,4 +25,15 @@ public class DestroySelfFunctionality : MonoBehaviour
     {
         Destroy(gameObject.transform.parent.gameObject);
     }
+
+    public void destroySelfAfter(float seconds)
+    {
+        StartCoroutine(destroySelfAfterEnumerator(seconds));
+    }
+    private IEnumerator destroySelfAfterEnumerator(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        destroySelf();
+        yield return null;
+    }
 }
