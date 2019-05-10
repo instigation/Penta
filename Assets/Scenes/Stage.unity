@@ -1764,6 +1764,7 @@ MonoBehaviour:
   - {fileID: 1808914403975994, guid: 0289118041cc0cc44ab2b17d96d90dbc, type: 3}
   - {fileID: 1808914403975994, guid: 0289118041cc0cc44ab2b17d96d90dbc, type: 3}
   - {fileID: 1808914403975994, guid: 0289118041cc0cc44ab2b17d96d90dbc, type: 3}
+  - {fileID: 1808914403975994, guid: 0289118041cc0cc44ab2b17d96d90dbc, type: 3}
   __gapPerBlockSize: 0.05
   __centerOfBoard: {fileID: 1713106974}
   __candidateLeftTopBlockSpawnPoint: {fileID: 1263188777}
@@ -3477,6 +3478,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5192fada937b4abd84d5d45a0384c77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  __stage: 0
+  __subStage: 0
   __slider: {fileID: 402383306}
   __text: {fileID: 224635497}
   __progressImages:

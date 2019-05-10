@@ -28,6 +28,7 @@ public class PuzzleStageController : MonoBehaviour {
     public BonusCalculator __bonusCalculator;
     private float blockDestroyAnimationClipTimeInSecond;
     private bool isRevived = false;
+    private bool isSixAppeared;
 
     // Use this for initialization
     void Start () {
@@ -48,15 +49,56 @@ public class PuzzleStageController : MonoBehaviour {
         Difficulty difficulty = resolveDifficulty();
         PuzzleGenerator generator = new PuzzleGenerator(num, difficulty);
         Puzzle p = generator.generatePuzzle();
+        while(p.squareEnvelopeWidth() > 9){
+            p = generator.generatePuzzle();
+        }
         puzzleSet = __renderer.render(p);
         __controller.setPuzzleSet(puzzleSet);
         blockDestroyAnimationClipTimeInSecond = puzzleSet.getDestroyAnimationTimeInSecond();
     }
     private int resolveNum() {
-        if (GlobalInformation.hasKey("num"))
-            return GlobalInformation.getInt("num");
-        else
+        int stage = __progressBar.getStage(), subStage = __progressBar.getSubStage();
+        if (subStage == 0)
+            isSixAppeared = false;
+        if ((stage == 1) && (subStage < 2))
+            return 1;
+        else if ((stage == 1) || (stage <= 2) && (subStage < 2))
+            return 2;
+        else if ((stage < 7) || (stage == 7) && (subStage < 2))
+            return 3;
+        else if (stage <= 10)
             return 4;
+        else if (stage <= 30)
+            return 4 + Penta.Utils.randomNumber(0, 2);
+        else if (stage <= 50)
+        {
+            if (!isSixAppeared)
+            {
+                // 5 - subStage is to make it uniform.
+                // odds to appear on 0th substage: 1/4
+                // odds to appear on 1st substage: 3/4*1/3 = 1/4
+                // .. 2nd .. : 3/4*2/3*1/2 = 1/4
+                // not appear : 1/4
+                int numToAdd = ((Penta.Utils.randomNumber(0, 4 - subStage) == 0) ? 1 : 0);
+                if (numToAdd == 1)
+                    isSixAppeared = true;
+                return 5 + numToAdd;
+            }
+            else return 5;
+        }
+        else
+        {
+            // it isn't uniform but probably okay.
+            if ((subStage == 2) && !isSixAppeared)
+                return 6;
+            else
+            {
+                int numToAdd = Penta.Utils.randomNumber(0, 2);
+                if (numToAdd == 1)
+                    isSixAppeared = true;
+                return 5 + numToAdd;
+            }
+        }
     }
     private Difficulty resolveDifficulty()
     {

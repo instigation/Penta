@@ -151,6 +151,18 @@ public class Puzzle {
         }
         return false;
     }
+    public int squareEnvelopeWidth()
+    {
+
+        List<Coordinate> blocks = new List<Coordinate>();
+        foreach (PlacedPiece pp in pieces)
+        {
+            blocks.AddRange(pp.getBlocks());
+        }
+        int width = Penta.Utils.widthOfEnvelope(blocks);
+        int height = Penta.Utils.heightOfEnvelope(blocks);
+        return width > height ? width : height;
+    }
 }
 
 public enum Rotation { NORTH, EAST, SOUTH, WEST };

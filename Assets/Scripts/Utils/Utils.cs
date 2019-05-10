@@ -12,8 +12,12 @@ namespace Penta
         /// </summary>
         private const int MIN_INT = -1000;
         private const int MAX_INT = 1000;
-        private static System.Random rng = new System.Random();
+        private static System.Random rng = new System.Random(), rng2 = new System.Random();
 
+        public static int randomNumber(int min, int max)
+        {
+            return rng2.Next(min, max);
+        }
         public static void Shuffle<T>(this IList<T> list)
         {
             int n = list.Count;
@@ -124,6 +128,14 @@ namespace Penta
                 mergedSet.AddRange(sub);
             }
             return (new Envelope(mergedSet)).center();
+        }
+        public static int widthOfEnvelope(List<Coordinate> set)
+        {
+            return (new Envelope(set)).getWidth();
+        }
+        public static int heightOfEnvelope(List<Coordinate> set)
+        {
+            return (new Envelope(set)).getHeight();
         }
         public static Coordinate centerTopOfEnvelope(List<Coordinate> set)
         {
