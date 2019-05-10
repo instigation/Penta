@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
 public class PuzzleStageController : MonoBehaviour {
@@ -18,6 +17,7 @@ public class PuzzleStageController : MonoBehaviour {
     public GameObject __gameOverPanel;
     public GameObject __clearText;
     public GameObject __centerOfBoard;
+    public GameObject __clearTextInstantiationPosition;
     public Camera __camera;
     public float clearTextTimeInSecond;
     public Vector2 __offsetToMoveOnSelect;
@@ -25,24 +25,19 @@ public class PuzzleStageController : MonoBehaviour {
     private AudioSource failSound;
     private GeneralInput input;
     private RenderedPuzzleSet puzzleSet;
-    private BonusCalculator bonusCalculator;
+    public BonusCalculator __bonusCalculator;
     private float blockDestroyAnimationClipTimeInSecond;
     private bool isRevived = false;
 
     // Use this for initialization
     void Start () {
         setInput();
-        setBonusCalculator();
         failSound = gameObject.GetComponent<AudioSource>();
     }
     private void setInput()
     {
         InputValidator workingspaceValidator = new EmptyValidator();
         input = new MouseInputWrapper(__canvas, __camera, workingspaceValidator);
-    }
-    private void setBonusCalculator()
-    {
-        bonusCalculator = new BonusCalculator(__progressBar, __bonusText, __normalParticle, __specialParticle, __canvas);
     }
     void OnEnable()
     {
@@ -102,11 +97,11 @@ public class PuzzleStageController : MonoBehaviour {
                     if (__controller.tryToInsertSelected())
                     {
                         InsertionResult insertionResult = puzzleSet.board.lastInsertionResult();
-                        bonusCalculator.calculateOnInsertion(insertionResult);
-                        addTime(bonusCalculator.getBonusTime());
-                        addScore(bonusCalculator.getBonusScore());
-                        bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedAnchoredPosition());
-                        bonusCalculator.playBonusParticle(puzzleSet.board.topOfLastInsertedAnchoredPosition());
+                        __bonusCalculator.calculateOnInsertion(insertionResult);
+                        addTime(__bonusCalculator.getBonusTime());
+                        addScore(__bonusCalculator.getBonusScore());
+                        __bonusCalculator.playBonusText(puzzleSet.board.topOfLastInsertedAnchoredPosition());
+                        __bonusCalculator.playBonusParticle(puzzleSet.board.topOfLastInsertedAnchoredPosition());
                         if (puzzleSet.board.isSolved())
                             clearPuzzle();
                         if (insertionResult == InsertionResult.WRONG)
@@ -118,111 +113,6 @@ public class PuzzleStageController : MonoBehaviour {
             }
         }
     }
-
-    private class BonusCalculator
-    {
-        private bool isLastInsertionCorrect;
-        private bool isStreakOccured;
-        private bool isCorrectInsertionOccured;
-        private int streak;
-        private ProgressBar progressBar;
-        private GameObject bonusText;
-        private GameObject normalParticle;
-        private GameObject specialParticle;
-        private GameObject canvas;
-
-        public BonusCalculator(ProgressBar progressBar, GameObject bonusText, GameObject normalParticle, GameObject specialParticle, GameObject canvas)
-        {
-            isLastInsertionCorrect = false;
-            isStreakOccured = false;
-            isCorrectInsertionOccured = false;
-            streak = 0;
-            //combo = 0;
-            this.progressBar = progressBar;
-            this.bonusText = bonusText;
-            this.normalParticle = normalParticle;
-            this.specialParticle = specialParticle;
-            this.canvas = canvas;
-        }
-        public void calculateOnInsertion(InsertionResult insertionResult)
-        {
-            switch (insertionResult)
-            {
-                case InsertionResult.CORRECT:
-                    isCorrectInsertionOccured = true;
-                    if (isLastInsertionCorrect)
-                    {
-                        streak++;
-                        isStreakOccured = true;
-                    }
-                    else
-                        isStreakOccured = false;
-                    isLastInsertionCorrect = true;
-                    break;
-                case InsertionResult.WRONG:
-                    isCorrectInsertionOccured = false;
-                    streak = 0;
-                    isStreakOccured = false;
-                    isLastInsertionCorrect = false;
-                    break;
-                case InsertionResult.MISS:
-                    isCorrectInsertionOccured = false;
-                    isStreakOccured = false;
-                    break;
-            }
-        }
-        public float getBonusTime()
-        {
-            return isStreakOccured ? 1 : 0;
-        }
-        public int getBonusScore()
-        {
-            return isCorrectInsertionOccured ? progressBar.getStage() * (streak + 1) : 0;
-        }
-        public void playBonusText(Vector2 position)
-        {
-            if (isCorrectInsertionOccured)
-            {
-                GameObject ret = Instantiate(bonusText);
-                ret.transform.SetParent(canvas.transform, false);
-                UnityUtils.moveUIElementToPosition(ret, position);
-                ret.transform.GetChild(0).GetChild(1).GetComponent<Text>().text = getScoreText();
-                ret.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = getComboText();
-            }
-        }
-        private string getComboText()
-        {
-            string ret; //= "\n+" + getBonusScore().ToString();
-            if (streak != 0)
-                ret = streak.ToString() + " Combo!";// + ret;
-            else ret = "";
-            //if (combo != 0)
-            //    ret = "Fast! x" + combo.ToString() + ret;
-            return ret;
-        }
-
-        private string getScoreText()
-        {
-            string ret = "+" + getBonusScore().ToString();
-            return ret;
-        }
-        public void playBonusParticle(Vector2 position)
-        {
-            if (isCorrectInsertionOccured)
-            {
-                if ((streak % 5 == 0) && (streak > 0))
-                    playParticle(specialParticle, position);
-                else
-                    playParticle(normalParticle, position);
-            }
-        }
-        private void playParticle(GameObject particle, Vector2 position)
-        {
-            UnityUtils.moveUIElementToPosition(particle, position);
-            particle.GetComponent<ParticleSystem>().Play();
-        }
-    }
-
 
     private void clearPuzzle() {
         puzzleSet.destroy();
@@ -254,7 +144,7 @@ public class PuzzleStageController : MonoBehaviour {
     {
         GameObject ret = Instantiate(__clearText);
         ret.transform.SetParent(__canvas.transform, false);
-        UnityUtils.moveUIElementToPosition(ret, UnityUtils.getPositionOfUIElement(__centerOfBoard));
+        UnityUtils.moveUIElementToPosition(ret, UnityUtils.getPositionOfUIElement(__clearTextInstantiationPosition));
     }
     private bool isGameOvered()
     {
@@ -289,7 +179,6 @@ public class PuzzleStageController : MonoBehaviour {
         ScoreChanger.setSavedScoreToZero(); // To make score zero when player terminates during the stage. The score is overwritten on puzzle clear.
         // progressByOne과 setBonusCalculator의 순서는 중요한데, bonus calculator가 stage number에 영향받기 때문
         __progressBar.progressByOne();
-        setBonusCalculator();
         renderPuzzle();
 
         __gameOverPanel.SetActive(false);

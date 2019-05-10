@@ -15,7 +15,7 @@ public class Sound : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        isMuted = GlobalInformation.getOrInitBool("isMuted", true);
+        isMuted = GlobalInformation.getOrInitBool("isMuted", false);
         setGameObjectsAccordingToIsMuted();
     }
 

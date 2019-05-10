@@ -120,6 +120,7 @@ public class RenderedPiece : StructuredPiece{
     // The renderedPiece is either candidate size or boardFit size.
     private bool isCandidateSize = true;
     private readonly float candidateBoardBlockSizeRatio = 2.0f;
+    private int[] originalSiblingIndex;
 
     public RenderedPiece(List<Block> rBlocks, List<Coordinate> blocks) 
         :base(rBlocks, blocks) {
@@ -184,6 +185,24 @@ public class RenderedPiece : StructuredPiece{
         {
             scale(candidateBoardBlockSizeRatio);
             isCandidateSize = false;
+        }
+    }
+    public void setSiblingIndexFrom(int startSiblingIndex)
+    {
+        originalSiblingIndex = new int[blocks.Count];
+        for(int i=0; i < blocks.Count; i++)
+        {
+            Transform blockTransform = blocks[i].gameObject.transform;
+            originalSiblingIndex[i] = blockTransform.GetSiblingIndex();
+            blockTransform.SetSiblingIndex(startSiblingIndex+i);
+        }
+    }
+    public void resetSiblingIndex()
+    {
+        for (int i = 0; i < blocks.Count; i++)
+        {
+            Transform blockTransform = blocks[i].gameObject.transform;
+            blockTransform.SetSiblingIndex(originalSiblingIndex[i]);
         }
     }
 }

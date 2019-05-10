@@ -58,8 +58,11 @@ public class PieceController : MonoBehaviour{
     private void select(int index) {
         selected = index;
         candidates[selected].setToBoardFitSize();
+        candidates[selected].setSiblingIndexFrom(100); // Assumes (# of blocks) < 100. That is, make them to be the last sibling.
     }
-    public void unSelect() {
+    public void unSelect()
+    {
+        candidates[selected].resetSiblingIndex();
         selected = NONE;
     }
     public bool tryToInsertSelected() {
@@ -93,6 +96,7 @@ public class PieceController : MonoBehaviour{
         {
             candidates[selected].reset();
             candidates[selected].setToCandidateSize();
+            candidates[selected].resetSiblingIndex();
         }
     }
     public void tryToExtractSelected() {

@@ -43,16 +43,18 @@ public class ScoreChanger : MonoBehaviour{
 
     private IEnumerator changeGraduallyCoroutine(int amount) {
         scoreToChange = amount;
+        int increaseUnit = amount / 60 + 1;
         int score = getScore();
         while (scoreToChange > 0)
         {
-            score++;
+            int increaseAmount = increaseUnit <= scoreToChange ? increaseUnit : scoreToChange;
+            score += increaseAmount;
             setScore(score);
             if (score > bestScore)
             {
                 setBestScore(score);
             }
-            scoreToChange--;
+            scoreToChange -= increaseAmount;
             yield return null;
         }
         GlobalInformation.setInt("bestScore", bestScore);
