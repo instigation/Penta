@@ -14,6 +14,7 @@ public class BonusCalculator : MonoBehaviour
     public GameObject __normalParticle;
     public GameObject __specialParticle;
     public GameObject __canvas;
+    private const int correctSoundIndex = 0, pentaCorrectSoundIndex = 1;
 
     void Start()
     {
@@ -67,6 +68,10 @@ public class BonusCalculator : MonoBehaviour
             UnityUtils.moveUIElementToPosition(ret, position);
             ret.transform.GetChild(0).GetChild(1).GetComponent<Text>().text = getScoreText();
             ret.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = getComboText();
+            if ((__streak % 5 == 0) && (__streak > 0))
+                ret.GetComponents<AudioSource>()[pentaCorrectSoundIndex].Play(0);
+            else
+                ret.GetComponents<AudioSource>()[correctSoundIndex].Play(0);
         }
     }
     private string getComboText()

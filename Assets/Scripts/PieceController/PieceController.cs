@@ -62,8 +62,11 @@ public class PieceController : MonoBehaviour{
     }
     public void unSelect()
     {
-        candidates[selected].resetSiblingIndex();
-        selected = NONE;
+        if(selected != NONE)
+        {
+            candidates[selected].resetSiblingIndex();
+            selected = NONE;
+        }
     }
     public bool tryToInsertSelected() {
         // postcondition: return false iff it wasn't insertion attempt. That is, iff there is no selected.

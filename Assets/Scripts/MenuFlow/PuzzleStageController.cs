@@ -32,7 +32,7 @@ public class PuzzleStageController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         setInput();
-        failSound = gameObject.GetComponent<AudioSource>();
+        failSound = gameObject.GetComponents<AudioSource>()[0];
     }
     private void setInput()
     {
