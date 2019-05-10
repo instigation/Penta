@@ -29,6 +29,8 @@ public class Timer : MonoBehaviour
     private bool inAudioSourceDelay = false;
     private float timeToChangeInSecond = 0.0f;
 
+    //타이머 색깔
+    private Color sky, scarlet;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,6 +39,9 @@ public class Timer : MonoBehaviour
         fillArea = timeSlider.transform.GetChild(1);
         fill = fillArea.GetChild(0);
         notMuchTimeSound = gameObject.GetComponent<AudioSource>();
+
+        sky = new Color(0, 0.706f, 1);
+        scarlet = new Color(1, 0.204f, 0.349f);
     }
 
     // Update is called once per frame
@@ -106,17 +111,17 @@ public class Timer : MonoBehaviour
     {
         if(leftoverTimeInSecond >= firstThreshold)
         {
-            fill.GetComponent<Image>().color = Color.blue;
+            fill.GetComponent<Image>().color = sky;
         }
         else if (leftoverTimeInSecond >= secondThreshold)
         {
             float blueWeight = (leftoverTimeInSecond - secondThreshold) / (firstThreshold - secondThreshold);
             float redWeight = 1 - blueWeight;
-            fill.GetComponent<Image>().color = (redWeight*Color.red+blueWeight*Color.blue);
+            fill.GetComponent<Image>().color = (redWeight*scarlet+blueWeight*sky);
         }
         else
         {
-            fill.GetComponent<Image>().color = Color.red;
+            fill.GetComponent<Image>().color = scarlet;
         }
     }
     private void setWidthAccordingToLeftoverTime()
