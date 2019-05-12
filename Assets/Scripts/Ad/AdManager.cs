@@ -19,6 +19,10 @@ public class AdManager: MonoBehaviour {
         adGiver = new EmptyAdGiver(__puzzleStageController);
         GlobalInformation.setBool("isAdRemoved", true);
     }
+    public bool isAdRemoved()
+    {
+        return GlobalInformation.getOrInitBool("isAdRemoved", false);
+    }
     public void hideBanner() { adGiver.hideBanner(); }
     public void showBanner() { adGiver.showBanner(); }
     public void showInterstitialIfLoadedAndNotTooFrequent()

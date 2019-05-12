@@ -8,23 +8,23 @@ public enum Stage { MENU, PUZZLE, SETTING, LEADERBOARD };
 
 public class StageChanger : MonoBehaviour
 {
-    public GameObject[] allGameObjects;
+    // It uses gameobject name as identifier.
+    public GameObject[] allGameObjects; // includes adRemoveButton
+    public GameObject adRemoveButton;
     private Stage currentStage;
     private string[] correspondingTags = { "Menu", "PuzzleStage", "Setting", "Leaderboard" };
     public AdManager adManager;
 
     void Awake()
     {
+        // MENU items are already activated in the fisrt place
         currentStage = Stage.MENU;
+        if (adManager.isAdRemoved())
+            setHide(adRemoveButton, true);
         setGameObjectsWithStage(Stage.PUZZLE, false);
         setGameObjectsWithStage(Stage.SETTING, false);
         setGameObjectsWithStage(Stage.LEADERBOARD, false);
         setGameObjectsWithStage(Stage.MENU, true);
-    }
-    // Update is called once per frame
-    void Update()
-    {
-
     }
     public void toStage(Stage stage) { toStage((int)stage); }
     public void toStage(int stage)
@@ -42,19 +42,26 @@ public class StageChanger : MonoBehaviour
         // So just used localScale method instead.
         foreach(GameObject obj in allGameObjects)
         {
+            if ((obj.name == adRemoveButton.name) && adManager.isAdRemoved())
+            {
+                continue;
+            }
             if (obj.tag == correspondingTags[(int)stage])
             {
-                RectTransform rectTransform = obj.GetComponent<RectTransform>();
-                if (rectTransform != null)
-                {
-                    rectTransform.localScale = isActive ? new Vector3(1,1,1) : new Vector3(0,0,0);
-                }
-                else
-                {
-                    obj.SetActive(isActive);
-                }
-
+                setHide(obj, !isActive);
             }
+        }
+    }
+    private void setHide(GameObject obj, bool hide)
+    {
+        RectTransform rectTransform = obj.GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            rectTransform.localScale = (!hide) ? new Vector3(1, 1, 1) : new Vector3(0, 0, 0);
+        }
+        else
+        {
+            obj.SetActive(!hide);
         }
     }
     private void setAds(Stage stage)
