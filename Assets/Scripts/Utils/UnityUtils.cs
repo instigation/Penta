@@ -27,11 +27,15 @@ public static class UnityUtils{
     public static List<Vector3> getPositionsOfUIElements(List<GameObject> targets) {
         List<Vector3> ret = new List<Vector3>();
         foreach (GameObject target in targets)
-            ret.Add(getPositionOfUIElement(target));
+            ret.Add(getAnchoredPositionOfUIElement(target));
         return ret;
     }
-    public static Vector3 getPositionOfUIElement(GameObject target) {
+    public static Vector3 getAnchoredPositionOfUIElement(GameObject target) {
         return target.GetComponent<RectTransform>().anchoredPosition;
+    }
+    public static Vector3 getLocalPositionOfUIElement(GameObject target)
+    {
+        return target.GetComponent<RectTransform>().localPosition;
     }
 
     public static Vector2 rotateClockwiseAQuater(Vector2 vector) {

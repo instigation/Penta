@@ -20,6 +20,7 @@ public class PuzzleSetRenderer : MonoBehaviour {
     // It is always 4x4 because the envelope of the piece could be 4x2,3x3,2x4.
     public float __gapBtwPieceBoxes;
     public Color[] __pieceColors;
+    public GameObject __boardParent, __pieceParent;
     private readonly bool __randomizeRotation = false;
     private Vector3 spawnOriginPosition;
 
@@ -38,7 +39,7 @@ public class PuzzleSetRenderer : MonoBehaviour {
         // 여기서 deep copy된 걸로 받아야 함.
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
         List<RenderedPiece> ret = new List<RenderedPiece>();
-        spawnOriginPosition = UnityUtils.getPositionOfUIElement(__candidateLeftTopBlockSpawnPoint);
+        spawnOriginPosition = UnityUtils.getLocalPositionOfUIElement(__candidateLeftTopBlockSpawnPoint);
         Color[] pieceColors = new Color[__pieceColors.Length];
         Array.Copy(__pieceColors, pieceColors, __pieceColors.Length);
         pieceColors.Shuffle();
@@ -47,12 +48,12 @@ public class PuzzleSetRenderer : MonoBehaviour {
             if (__randomizeRotation)
                 Utils.rotateRandomlySavingWidth(pieceInCoordinate);
             Utils.leftTopToOrigin(pieceInCoordinate);
-            PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __gapPerBlockSize);
+            PieceRenderer renderer = new PieceRenderer(__pieceBlocks[i], __gapPerBlockSize, __pieceParent);
             RenderedPiece renderedPiece = renderer.render(pieceInCoordinate, spawnOriginPosition, pieceColors[i]);
             if (i == 2)
             {
                 spawnOriginPosition.y -= 4 * UnityUtils.getWidthOfUIElement(__pieceBlocks[0]) + __gapBtwPieceBoxes;
-                spawnOriginPosition.x = UnityUtils.getPositionOfUIElement(__candidateLeftTopBlockSpawnPoint).x;
+                spawnOriginPosition.x = UnityUtils.getAnchoredPositionOfUIElement(__candidateLeftTopBlockSpawnPoint).x;
             }
             else
             {
@@ -68,20 +69,22 @@ public class PuzzleSetRenderer : MonoBehaviour {
     private RenderedPuzzle renderPuzzle(Puzzle p) {
         List<List<Coordinate>> piecesInCoordinate = p.getBlocks();
         Utils.centerToOrigin(piecesInCoordinate);
-        PuzzleRenderer renderer = new PuzzleRenderer(__boardBlock, __boardBlockBackground, __gapPerBlockSize);
-        RenderedPuzzle ret = renderer.render(piecesInCoordinate, UnityUtils.getPositionOfUIElement(__centerOfBoard));
+        PuzzleRenderer renderer = new PuzzleRenderer(__boardBlock, __boardBlockBackground, __gapPerBlockSize, __boardParent);
+        RenderedPuzzle ret = renderer.render(piecesInCoordinate, UnityUtils.getAnchoredPositionOfUIElement(__centerOfBoard));
         return ret;
     }
 }
 
 public class PieceRenderer{
+    private GameObject parent;
     private GameObject pieceBlock;
     private float gapPerBlockSize;
     private Vector3 leftMostPosition;
 
-    public PieceRenderer(GameObject pieceBlock, float gapPerBlockSize) {
+    public PieceRenderer(GameObject pieceBlock, float gapPerBlockSize, GameObject parent) {
         this.pieceBlock = pieceBlock;
         this.gapPerBlockSize = gapPerBlockSize;
+        this.parent = parent;
     }
     public RenderedPiece render(List<Coordinate> blocks, Vector3 originPosition, Color pieceColor) {
         return renderBlocksAtOrigin(blocks, originPosition, pieceColor);
@@ -107,19 +110,21 @@ public class PieceRenderer{
     }
     private GameObject renderOneBlockAt(Vector3 position)
     {
-        return MonoBehaviourUtils.renderBlockWithPosition(pieceBlock, position);
+        return MonoBehaviourUtils.renderBlockWithPosition(pieceBlock, position, parent);
     }
 }
 
 public class PuzzleRenderer{
+    private GameObject parent;
     private GameObject boardBlock;
     private GameObject boardBlockBackground;
     private float gapPerBlockSize;
 
-    public PuzzleRenderer(GameObject boardBlock, GameObject boardBlockBackground, float gapPerBlockSize) {
+    public PuzzleRenderer(GameObject boardBlock, GameObject boardBlockBackground, float gapPerBlockSize, GameObject parent) {
         this.boardBlock = boardBlock;
         this.boardBlockBackground = boardBlockBackground;
         this.gapPerBlockSize = gapPerBlockSize;
+        this.parent = parent;
     }
     public RenderedPuzzle render(List<List<Coordinate>> pieces, Vector3 centerPosition) {
         float distance = blockSize() * (1 + gapPerBlockSize);
@@ -164,7 +169,7 @@ public class PuzzleRenderer{
         return UnityUtils.getWidthOfUIElement(boardBlock);
     }
     private GameObject renderBlockAt(Vector3 position, GameObject block) {
-        return MonoBehaviourUtils.renderBlockWithPosition(block, position);
+        return MonoBehaviourUtils.renderBlockWithPosition(block, position, parent);
     }
     public void showAns() {
         // 정답을 rendering하게 되면 정답이 조각보다 위에 위치해서

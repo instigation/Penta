@@ -8,7 +8,6 @@ public class MonoBehaviourUtils : MonoBehaviour {
     /// 상속받아서 이상해질 수 있으므로.
     /// </summary>
     // below line이 될지 모르겠지만 일단 이렇게 해보자
-    public GameObject __parent;
     public GameObject __textPrefab;
     private static MonoBehaviourUtils singleton = null;
     private MonoBehaviourUtils() {
@@ -21,13 +20,13 @@ public class MonoBehaviourUtils : MonoBehaviour {
         return singleton;
     }
 
-    public static GameObject renderBlockWithPosition(GameObject target, Vector2 position) {
-        return getInstance().renderBlockWithPositionAtSingleton(target, position);
+    public static GameObject renderBlockWithPosition(GameObject target, Vector2 position, GameObject parent) {
+        return getInstance().renderBlockWithPositionAtSingleton(target, position, parent);
     }
-    
-    private GameObject renderBlockWithPositionAtSingleton(GameObject target, Vector2 position) {
+
+    private GameObject renderBlockWithPositionAtSingleton(GameObject target, Vector2 position, GameObject parent) {
         GameObject ret = Instantiate(target);
-        ret.transform.SetParent(__parent.transform, false);
+        ret.transform.SetParent(parent.transform, false);
         UnityUtils.moveUIElementToPosition(ret, position);
         return ret;
     }
@@ -45,12 +44,4 @@ public class MonoBehaviourUtils : MonoBehaviour {
         return ret;
     }
 
-    public static GameObject renderText() {
-        return getInstance().renderTextSomewhere();
-    }
-    private GameObject renderTextSomewhere() {
-        GameObject ret = Instantiate(__textPrefab);
-        ret.transform.SetParent(__parent.transform, false);
-        return ret;
-    }
 }
