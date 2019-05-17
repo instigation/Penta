@@ -201,6 +201,7 @@ public class PuzzleStageController : MonoBehaviour {
     }
     public void resetStage()
     {
+        __bonusCalculator.reset();
         __gameOverPanel.SetActive(false);
         // Refill is necessary to avoid reactivation of the panel due to time being zero.
         __timer.pause();
@@ -235,6 +236,7 @@ public class PuzzleStageController : MonoBehaviour {
     }
     public void reviveStage()
     {
+        __bonusCalculator.reset();
         __gameOverPanel.SetActive(false);
         __timer.refillTime();
         __timer.run();

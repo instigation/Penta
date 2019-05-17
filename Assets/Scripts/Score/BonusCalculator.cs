@@ -18,11 +18,7 @@ public class BonusCalculator : MonoBehaviour
 
     void Start()
     {
-        isLastInsertionCorrect = false;
-        isStreakOccured = false;
-        isCorrectInsertionOccured = false;
-        __streak = 0;
-        //combo = 0;
+        reset();
     }
     public void calculateOnInsertion(InsertionResult insertionResult)
     {
@@ -99,6 +95,13 @@ public class BonusCalculator : MonoBehaviour
             else
                 playParticle(__normalParticle, position);
         }
+    }
+    public void reset()
+    {
+        isLastInsertionCorrect = false;
+        isStreakOccured = false;
+        isCorrectInsertionOccured = false;
+        __streak = 0;
     }
     private void playParticle(GameObject particle, Vector2 position)
     {
