@@ -55,14 +55,22 @@ public class Timer : MonoBehaviour
         }
     }
 
-    public void refillTime()
+    public void resetTime()
     {
-        manuallyChangeTime(maxTimeInSecond - leftoverTimeInSecond);
+        const float epsilon = 0.01f;
+        if (maxTimeInSecond < leftoverTimeInSecond + epsilon)
+            leftoverTimeInSecond = maxTimeInSecond;
+        else
+            manuallyChangeTime(maxTimeInSecond - leftoverTimeInSecond);
     }
 
     public void manuallyChangeTime(float second)
     {
         const float epsilon = 0.02f;
+        float maxIncearsableTime = maxTimeInSecond - leftoverTimeInSecond;
+        second = second > maxIncearsableTime ? maxIncearsableTime : second;
+        Debug.Log(second);
+        Debug.Log(maxIncearsableTime);
         if (timeToChangeInSecond >= epsilon)
         {
             timeToChangeInSecond += second;

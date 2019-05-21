@@ -205,7 +205,7 @@ public class PuzzleStageController : MonoBehaviour {
         __gameOverPanel.SetActive(false);
         // Refill is necessary to avoid reactivation of the panel due to time being zero.
         __timer.pause();
-        __timer.refillTime();
+        __timer.resetTime();
         puzzleSet.destroy();
         StartCoroutine(resetStageAfterDestroy());
     }
@@ -225,7 +225,7 @@ public class PuzzleStageController : MonoBehaviour {
         renderPuzzle();
 
         __gameOverPanel.SetActive(false);
-        __timer.refillTime();
+        __timer.resetTime();
         __timer.run();
         isRevived = false;
     }
@@ -234,11 +234,12 @@ public class PuzzleStageController : MonoBehaviour {
         __gameOverPanel.SetActive(true);
         __timer.pause();
     }
+    public void pauseTimer() { __timer.pause(); }
     public void reviveStage()
     {
         __bonusCalculator.reset();
         __gameOverPanel.SetActive(false);
-        __timer.refillTime();
+        __timer.resetTime();
         __timer.run();
         isRevived = true;
     }

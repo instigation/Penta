@@ -102,6 +102,7 @@ public class AdGiver : IAdGiver
     public void HandleRewardBasedVideoLoaded(object sender, System.EventArgs args)
     {
         isRewarded = false;
+        puzzleStageController.pauseTimer();
     }
     public void HandleRewardBasedVideoFailedToLoad(object sender, AdFailedToLoadEventArgs args)
     {
