@@ -9,6 +9,8 @@ public class ScoreChanger : MonoBehaviour{
     private int bestScore;
     private int scoreToChange = 0;
     private int trueScore; // When score rising animation is being played, presented score is different from the true score.
+    private readonly int scoreChangeFrameCount = 30;
+    private int increaseUnit;
 
     public void Start()
     {
@@ -28,9 +30,17 @@ public class ScoreChanger : MonoBehaviour{
     {
         trueScore += amount;
         if (scoreToChange > 0)
+        {
             scoreToChange += amount;
+            increaseUnit = scoreToChange / scoreChangeFrameCount;
+            increaseUnit = increaseUnit > 1 ? increaseUnit : 1;
+        }
         else
+        {
+            increaseUnit = amount / scoreChangeFrameCount;
+            increaseUnit = increaseUnit > 1 ? increaseUnit : 1;
             StartCoroutine(changeGraduallyCoroutine(amount));
+        }
     }
     public void saveScore()
     {
@@ -43,10 +53,9 @@ public class ScoreChanger : MonoBehaviour{
 
     private IEnumerator changeGraduallyCoroutine(int amount) {
         scoreToChange = amount;
-        int increaseUnit = amount / 60 + 1;
-        int score = getScore();
         while (scoreToChange > 0)
         {
+            int score = getScore();
             int increaseAmount = increaseUnit <= scoreToChange ? increaseUnit : scoreToChange;
             score += increaseAmount;
             setScore(score);

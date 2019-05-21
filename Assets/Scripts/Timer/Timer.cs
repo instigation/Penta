@@ -69,8 +69,6 @@ public class Timer : MonoBehaviour
         const float epsilon = 0.02f;
         float maxIncearsableTime = maxTimeInSecond - leftoverTimeInSecond;
         second = second > maxIncearsableTime ? maxIncearsableTime : second;
-        Debug.Log(second);
-        Debug.Log(maxIncearsableTime);
         if (timeToChangeInSecond >= epsilon)
         {
             timeToChangeInSecond += second;
