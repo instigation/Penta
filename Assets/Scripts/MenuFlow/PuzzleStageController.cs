@@ -190,7 +190,7 @@ public class PuzzleStageController : MonoBehaviour {
     }
     private bool isGameOvered()
     {
-        return __timer.getLeftoverTimeInSecond() < 0.0f;
+        return __timer.getLeftoverTimeInSecond() < 0.05f;
     }
     private void addScore(int amount) {
         __scoreChanger.changeGradually(amount);

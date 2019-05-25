@@ -42,7 +42,7 @@ public class AdGiver : IAdGiver
     private void requestBanner()
     {
 #if UNITY_ANDROID
-            string adUnitId = "ca-app-pub-9427427719096864/2663810991";
+            string adUnitId = "ca-app-pub-3940256099942544/6300978111";
 #elif UNITY_IPHONE
             string adUnitId = "ca-app-pub-9427427719096864/6174136007";
 #else
@@ -58,7 +58,7 @@ public class AdGiver : IAdGiver
     private void requestInterstitial()
     {
 #if UNITY_ANDROID
-        string adUnitId = "ca-app-pub-9427427719096864/9071762086";
+        string adUnitId = "ca-app-pub-3940256099942544/1033173712";
 #elif UNITY_IPHONE
         string adUnitId = "ca-app-pub-9427427719096864/3883369808";
 #else
@@ -92,7 +92,7 @@ public class AdGiver : IAdGiver
     private void requestRewardBasedVideo()
     {
 #if UNITY_ANDROID
-            string adUnitId = "ca-app-pub-9427427719096864/7724565988";
+            string adUnitId = "ca-app-pub-3940256099942544/5224354917";
 #elif UNITY_IPHONE
             string adUnitId = "ca-app-pub-9427427719096864/4861054334";
 #else
@@ -128,11 +128,10 @@ public class AdGiver : IAdGiver
     }
     public void HandleRewardBasedVideoClosed(object sender, System.EventArgs args)
     {
-        latestAdClosedTime = Time.fixedTime;
-        requestRewardBasedVideo();
-        assignRewardBasedVideoHandlers();
         if (!isRewarded)
             puzzleStageController.resetStage();
+        latestAdClosedTime = Time.fixedTime;
+        requestRewardBasedVideo();
     }
 
 
