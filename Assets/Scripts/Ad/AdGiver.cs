@@ -17,7 +17,17 @@ public class AdGiver : IAdGiver
     {
         this.puzzleStageController = puzzleStageController;
         MobileAds.SetiOSAppPauseOnBackground(true);
-        // TODO: get AppId
+
+#if UNITY_ANDROID
+        string appId = "ca-app-pub-9427427719096864~5990274619";
+#elif UNITY_IPHONE
+            string appId = "ca-app-pub-9427427719096864~9333161122";
+#else
+            string appId = "unexpected_platform";
+#endif
+
+        // Initialize the Google Mobile Ads SDK.
+        MobileAds.Initialize(appId);
 
         requestBanner();
 
@@ -34,7 +44,7 @@ public class AdGiver : IAdGiver
 #if UNITY_ANDROID
             string adUnitId = "ca-app-pub-9427427719096864/2663810991";
 #elif UNITY_IPHONE
-            string adUnitId = "ca-app-pub-3940256099942544/2934735716";
+            string adUnitId = "ca-app-pub-9427427719096864/6174136007";
 #else
         string adUnitId = "unexpected_platform";
 #endif
@@ -50,11 +60,12 @@ public class AdGiver : IAdGiver
 #if UNITY_ANDROID
         string adUnitId = "ca-app-pub-9427427719096864/9071762086";
 #elif UNITY_IPHONE
-        string adUnitId = "ca-app-pub-3940256099942544/4411468910";
+        string adUnitId = "ca-app-pub-9427427719096864/3883369808";
 #else
         string adUnitId = "unexpected_platform";
 #endif
-
+        if (interstitial != null)
+            interstitial.Destroy();
         // Initialize an InterstitialAd.
         interstitial = new InterstitialAd(adUnitId);
         // Create an empty ad request.
@@ -76,13 +87,14 @@ public class AdGiver : IAdGiver
     {
         latestAdClosedTime = Time.fixedTime;
         requestInterstitial();
+        assignInterstitialHandlers();
     }
     private void requestRewardBasedVideo()
     {
 #if UNITY_ANDROID
             string adUnitId = "ca-app-pub-9427427719096864/7724565988";
 #elif UNITY_IPHONE
-            string adUnitId = "ca-app-pub-3940256099942544/1712485313";
+            string adUnitId = "ca-app-pub-9427427719096864/4861054334";
 #else
         string adUnitId = "unexpected_platform";
 #endif
@@ -118,6 +130,7 @@ public class AdGiver : IAdGiver
     {
         latestAdClosedTime = Time.fixedTime;
         requestRewardBasedVideo();
+        assignRewardBasedVideoHandlers();
         if (!isRewarded)
             puzzleStageController.resetStage();
     }
@@ -135,7 +148,7 @@ public class AdGiver : IAdGiver
 
     public void showInterstitialIfLoaded()
     {
-        if (this.interstitial.IsLoaded())
+        if ((this.interstitial != null) && this.interstitial.IsLoaded())
         {
             this.interstitial.Show();
         }
@@ -143,7 +156,7 @@ public class AdGiver : IAdGiver
 
     public void showRewardBasedVideoIfLoaded()
     {
-        if (rewardBasedVideo.IsLoaded())
+        if ((rewardBasedVideo != null) && rewardBasedVideo.IsLoaded())
         {
             rewardBasedVideo.Show();
         }
