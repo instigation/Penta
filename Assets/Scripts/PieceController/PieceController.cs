@@ -20,6 +20,7 @@ public class PieceController : MonoBehaviour{
         isInserted = new List<bool>();
         for (int i = 0; i < n; i++)
             isInserted.Add(false);
+        selected = NONE;
     }
     public void rotateSelected() {
         if (selected != NONE)

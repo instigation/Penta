@@ -32,7 +32,6 @@ public class PuzzleStageController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        setInput();
         failSound = gameObject.GetComponents<AudioSource>()[0];
     }
     private void setInput()
@@ -224,6 +223,7 @@ public class PuzzleStageController : MonoBehaviour {
         __progressBar.progressByOne();
         renderPuzzle();
 
+        setInput();
         __gameOverPanel.SetActive(false);
         __timer.resetTime();
         __timer.run();
@@ -239,6 +239,7 @@ public class PuzzleStageController : MonoBehaviour {
     {
         __bonusCalculator.reset();
         __gameOverPanel.SetActive(false);
+        setInput();
         __timer.resetTime();
         __timer.run();
         isRevived = true;

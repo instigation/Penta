@@ -163,6 +163,7 @@ public class AdGiver : IAdGiver
 
     public double latestAdClosedTimeFromStartInSeconds()
     {
+        return -100;
         return latestAdClosedTime;
     }
 }

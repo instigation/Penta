@@ -9,6 +9,7 @@ public interface GeneralInput {
     bool touchBegan();
     bool touchMoved();
     bool touchEnded();
+    void reset();
     // precondition: valid only during BEGAN~MOVED~ENDED
     float timeCollapsedAfterLastTouch();
     Vector2 anchoredPosition();
@@ -30,6 +31,11 @@ public class MouseInputWrapper : GeneralInput {
         this.camera = camera;
         this.validator = validator;
         this.lastTouchedFrame = -1000;
+    }
+    public void reset()
+    {
+        current = state.IDLE;
+        lastTouchedFrame = -1000;
     }
     public void update() {
         stateTransition();
