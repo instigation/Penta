@@ -49,7 +49,7 @@ public class BonusCalculator : MonoBehaviour
     }
     public float getBonusTime()
     {
-        return isStreakOccured ? 1 : 0;
+        return isStreakOccured ? 3.0f : 0;
     }
     public int getBonusScore()
     {
@@ -109,4 +109,3 @@ public class BonusCalculator : MonoBehaviour
         particle.GetComponent<ParticleSystem>().Play();
     }
 }
-

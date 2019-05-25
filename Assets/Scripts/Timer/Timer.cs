@@ -15,7 +15,7 @@ public class Timer : MonoBehaviour
     private Transform fill;
     private Transform fillArea;
     private AudioSource notMuchTimeSound;
-    private readonly float maxTimeInSecond = 30;
+    private readonly float maxTimeInSecond = 25.0f;
     private readonly float timeChangeDurationInSecond = 0.2F;
     // value보다 정확한 버전이다. value만 자꾸 바꿔쓰면 오차 많아질까봐 (deltaTime쓰니)
     // 그래서 value는 leftoverTimeInSecond로 update만 하고 읽지 않는다 

@@ -16,6 +16,7 @@ public class AdGiver : IAdGiver
     public AdGiver(PuzzleStageController puzzleStageController)
     {
         this.puzzleStageController = puzzleStageController;
+        MobileAds.SetiOSAppPauseOnBackground(true);
         // TODO: get AppId
 
         requestBanner();
@@ -31,7 +32,7 @@ public class AdGiver : IAdGiver
     private void requestBanner()
     {
 #if UNITY_ANDROID
-            string adUnitId = "ca-app-pub-3940256099942544/6300978111";
+            string adUnitId = "ca-app-pub-9427427719096864/2663810991";
 #elif UNITY_IPHONE
             string adUnitId = "ca-app-pub-3940256099942544/2934735716";
 #else
@@ -47,7 +48,7 @@ public class AdGiver : IAdGiver
     private void requestInterstitial()
     {
 #if UNITY_ANDROID
-        string adUnitId = "ca-app-pub-3940256099942544/1033173712";
+        string adUnitId = "ca-app-pub-9427427719096864/9071762086";
 #elif UNITY_IPHONE
         string adUnitId = "ca-app-pub-3940256099942544/4411468910";
 #else
@@ -79,7 +80,7 @@ public class AdGiver : IAdGiver
     private void requestRewardBasedVideo()
     {
 #if UNITY_ANDROID
-            string adUnitId = "ca-app-pub-3940256099942544/5224354917";
+            string adUnitId = "ca-app-pub-9427427719096864/7724565988";
 #elif UNITY_IPHONE
             string adUnitId = "ca-app-pub-3940256099942544/1712485313";
 #else
@@ -102,7 +103,6 @@ public class AdGiver : IAdGiver
     public void HandleRewardBasedVideoLoaded(object sender, System.EventArgs args)
     {
         isRewarded = false;
-        puzzleStageController.pauseTimer();
     }
     public void HandleRewardBasedVideoFailedToLoad(object sender, AdFailedToLoadEventArgs args)
     {
