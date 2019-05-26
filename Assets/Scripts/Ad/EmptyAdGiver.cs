@@ -11,8 +11,8 @@ public class EmptyAdGiver : IAdGiver
     }
     public void hideBanner() { }
     public void showBanner() { }
-    public void showInterstitialIfLoaded() { }
-    public void showRewardBasedVideoIfLoaded()
+    public void tryToShowInterstitial() { }
+    public void tryToShowRewardBasedVideo()
     {
         puzzleStageController.reviveStage();
     }

@@ -5,8 +5,8 @@ namespace Penta
     {
         void hideBanner();
         void showBanner();
-        void showInterstitialIfLoaded();
-        void showRewardBasedVideoIfLoaded();
+        void tryToShowInterstitial();
+        void tryToShowRewardBasedVideo();
         // Gives 0 if Ad never occured after the start.
         double latestAdClosedTimeFromStartInSeconds();
     }

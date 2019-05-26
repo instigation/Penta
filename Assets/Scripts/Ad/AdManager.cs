@@ -30,12 +30,12 @@ public class AdManager: MonoBehaviour {
         double currentTime = Time.fixedTime;
         if(currentTime - adGiver.latestAdClosedTimeFromStartInSeconds() > 60)
         {
-            adGiver.showInterstitialIfLoaded();
+            adGiver.tryToShowInterstitial();
         }
     }
 
     public void showRewardBasedVideoIfLoaded()
     {
-        adGiver.showRewardBasedVideoIfLoaded();
+        adGiver.tryToShowRewardBasedVideo();
     }
 }

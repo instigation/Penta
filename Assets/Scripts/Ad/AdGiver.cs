@@ -10,6 +10,7 @@ public class AdGiver : IAdGiver
     private InterstitialAd interstitial;
     private BannerView bannerView;
     private RewardBasedVideoAd rewardBasedVideo;
+    private bool bannerFailedToLoad = false;
     private bool isRewarded;
     private double latestAdClosedTime = 0;
 
@@ -31,8 +32,7 @@ public class AdGiver : IAdGiver
 
         requestBanner();
 
-        requestInterstitial();
-        assignInterstitialHandlers();
+        requestAndAssignHandlersInterstitial();
 
         // Get singleton reward based video ad reference.
         rewardBasedVideo = RewardBasedVideoAd.Instance;
@@ -42,7 +42,7 @@ public class AdGiver : IAdGiver
     private void requestBanner()
     {
 #if UNITY_ANDROID
-            string adUnitId = "ca-app-pub-9427427719096864/2663810991";
+            string adUnitId = "ca-app-pub-3940256099942544/6300978111";
 #elif UNITY_IPHONE
             string adUnitId = "ca-app-pub-9427427719096864/6174136007";
 #else
@@ -52,13 +52,23 @@ public class AdGiver : IAdGiver
         bannerView = new BannerView(adUnitId, AdSize.Banner, AdPosition.Bottom);
         // Create an empty ad request.
         AdRequest request = new AdRequest.Builder().Build();
+        bannerView.OnAdFailedToLoad += HandleOnBannerFailedToLoad;
+        bannerView.OnAdLoaded += HandleOnBannerLoaded;
         // Load the banner with the request.
         bannerView.LoadAd(request);
     }
-    private void requestInterstitial()
+    public void HandleOnBannerFailedToLoad(object sender, System.EventArgs args)
+    {
+        bannerFailedToLoad = true;
+    }
+    public void HandleOnBannerLoaded(object sender, System.EventArgs args)
+    {
+        bannerFailedToLoad = false;
+    }
+    private void requestAndAssignHandlersInterstitial()
     {
 #if UNITY_ANDROID
-        string adUnitId = "ca-app-pub-9427427719096864/9071762086";
+        string adUnitId = "ca-app-pub-3940256099942544/1033173712";
 #elif UNITY_IPHONE
         string adUnitId = "ca-app-pub-9427427719096864/3883369808";
 #else
@@ -68,31 +78,22 @@ public class AdGiver : IAdGiver
             interstitial.Destroy();
         // Initialize an InterstitialAd.
         interstitial = new InterstitialAd(adUnitId);
+        // Assign Handlers
+        interstitial.OnAdClosed += HandleOnInterstitialClosed;
         // Create an empty ad request.
         AdRequest request = new AdRequest.Builder().Build();
         // Load the interstitial with the request.
         interstitial.LoadAd(request);
     }
-    private void assignInterstitialHandlers()
-    {
-        interstitial.OnAdFailedToLoad += HandleOnInterstitialFailedToLoad;
-        interstitial.OnAdClosed += HandleOnInterstitialClosed;
-    }
-    public void HandleOnInterstitialFailedToLoad(object sender, AdFailedToLoadEventArgs args)
-    {
-        MonoBehaviour.print("HandleFailedToReceiveAd event received with message: "
-                            + args.Message);
-    }
     public void HandleOnInterstitialClosed(object sender, System.EventArgs args)
     {
         latestAdClosedTime = Time.fixedTime;
-        requestInterstitial();
-        assignInterstitialHandlers();
+        requestAndAssignHandlersInterstitial();
     }
     private void requestRewardBasedVideo()
     {
 #if UNITY_ANDROID
-            string adUnitId = "ca-app-pub-9427427719096864/7724565988";
+            string adUnitId = "ca-app-pub-3940256099942544/5224354917";
 #elif UNITY_IPHONE
             string adUnitId = "ca-app-pub-9427427719096864/4861054334";
 #else
@@ -107,7 +108,6 @@ public class AdGiver : IAdGiver
     private void assignRewardBasedVideoHandlers()
     {
         rewardBasedVideo.OnAdLoaded += HandleRewardBasedVideoLoaded;
-        rewardBasedVideo.OnAdFailedToLoad += HandleRewardBasedVideoFailedToLoad;
         rewardBasedVideo.OnAdRewarded += HandleRewardBasedVideoRewarded;
         // Called when the ad is closed (either refused or finished watching).
         rewardBasedVideo.OnAdClosed += HandleRewardBasedVideoClosed;
@@ -115,11 +115,6 @@ public class AdGiver : IAdGiver
     public void HandleRewardBasedVideoLoaded(object sender, System.EventArgs args)
     {
         isRewarded = false;
-    }
-    public void HandleRewardBasedVideoFailedToLoad(object sender, AdFailedToLoadEventArgs args)
-    {
-        Debug.Log("Rewarded video ad failed to load: " + args.Message);
-        // TODO: Handle the ad failed to load event.
     }
     public void HandleRewardBasedVideoRewarded(object sender, Reward args)
     {
@@ -142,22 +137,40 @@ public class AdGiver : IAdGiver
 
     public void showBanner()
     {
+        if (bannerFailedToLoad)
+            requestBanner();
         bannerView.Show();
     }
 
-    public void showInterstitialIfLoaded()
+    public void tryToShowInterstitial()
     {
         if ((this.interstitial != null) && this.interstitial.IsLoaded())
         {
             this.interstitial.Show();
         }
+        else
+        {
+            requestAndAssignHandlersInterstitial();
+            if ((this.interstitial != null) && this.interstitial.IsLoaded())
+            {
+                this.interstitial.Show();
+            }
+        }
     }
 
-    public void showRewardBasedVideoIfLoaded()
+    public void tryToShowRewardBasedVideo()
     {
         if ((rewardBasedVideo != null) && rewardBasedVideo.IsLoaded())
         {
             rewardBasedVideo.Show();
+        }
+        else
+        {
+            requestRewardBasedVideo();
+            if ((rewardBasedVideo != null) && rewardBasedVideo.IsLoaded())
+            {
+                rewardBasedVideo.Show();
+            }
         }
     }
 
