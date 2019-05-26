@@ -19,7 +19,7 @@ public class AdGiver : IAdGiver
         MobileAds.SetiOSAppPauseOnBackground(true);
 
 #if UNITY_ANDROID
-        string appId = "ca-app-pub-9427427719096864~5990274619";
+        string appId = "ca-app-pub-9427427719096864~1384843757";
 #elif UNITY_IPHONE
             string appId = "ca-app-pub-9427427719096864~9333161122";
 #else
