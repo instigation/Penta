@@ -11,3 +11,4 @@
 # How to run
 * Unity 2018.3.8f1 혹은 이후 버전 설치
 * Unity의 File > Build Settings에서 Android 선택
+* Assets/Scenes에서 Stage 선택
