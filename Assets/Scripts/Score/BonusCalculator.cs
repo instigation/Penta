@@ -55,13 +55,13 @@ public class BonusCalculator : MonoBehaviour
     {
         return isCorrectInsertionOccured ? __progressBar.getStage() * (__streak + 1) : 0;
     }
-    public void playBonusText(Vector2 position)
+    public void playBonusText(Vector2 anchoredPosition)
     {
         if (isCorrectInsertionOccured)
         {
             GameObject ret = Instantiate(__bonusText);
             ret.transform.SetParent(__canvas.transform, false);
-            UnityUtils.moveUIElementToPosition(ret, position);
+            UnityUtils.moveUIElementToAnchoredPosition(ret, anchoredPosition);
             ret.transform.GetChild(0).GetChild(1).GetComponent<Text>().text = getScoreText();
             ret.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = getComboText();
             if ((__streak % 5 == 0) && (__streak > 0))
@@ -103,9 +103,9 @@ public class BonusCalculator : MonoBehaviour
         isCorrectInsertionOccured = false;
         __streak = 0;
     }
-    private void playParticle(GameObject particle, Vector2 position)
+    private void playParticle(GameObject particle, Vector2 anchoredPosition)
     {
-        UnityUtils.moveUIElementToPosition(particle, position);
+        UnityUtils.moveUIElementToAnchoredPosition(particle, anchoredPosition);
         particle.GetComponent<ParticleSystem>().Play();
     }
 }

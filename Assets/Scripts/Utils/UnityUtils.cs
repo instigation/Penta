@@ -6,29 +6,14 @@ public static class UnityUtils{
         return new Vector3(coor.x, coor.y);
     }
 
-    public static void moveUIElementForDistance(GameObject target, Vector2 distance) {
-        target.GetComponent<RectTransform>().anchoredPosition += distance;
-    }
 
-    public static void moveUIElementToPosition(GameObject target, Vector3 position) {
+    public static void moveUIElementToAnchoredPosition(GameObject target, Vector3 position) {
         target.GetComponent<RectTransform>().anchoredPosition = position;
     }
 
     public static float getWidthOfUIElement(GameObject target) {
         float scaleFactor = target.GetComponent<RectTransform>().localScale.x;
         return target.GetComponent<RectTransform>().rect.width * scaleFactor;
-    }
-
-    public static void makeSquareAtOrigin(GameObject target, float sideLength)
-    {
-        target.GetComponent<RectTransform>().rect.Set(0, 0, sideLength, sideLength);
-    }
-
-    public static List<Vector3> getPositionsOfUIElements(List<GameObject> targets) {
-        List<Vector3> ret = new List<Vector3>();
-        foreach (GameObject target in targets)
-            ret.Add(getAnchoredPositionOfUIElement(target));
-        return ret;
     }
     public static Vector3 getAnchoredPositionOfUIElement(GameObject target) {
         return target.GetComponent<RectTransform>().anchoredPosition;
@@ -40,11 +25,6 @@ public static class UnityUtils{
 
     public static Vector2 rotateClockwiseAQuater(Vector2 vector) {
         return new Vector2(vector.y, -vector.x);
-    }
-
-    public static void scaleSizeOfUIElement(GameObject target, float factor)
-    {
-        target.GetComponent<RectTransform>().localScale *= factor;
     }
 
     public class Square {

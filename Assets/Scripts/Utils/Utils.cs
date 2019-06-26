@@ -10,8 +10,6 @@ namespace Penta
         /// <summary>
         /// set이란 connected blocks.
         /// </summary>
-        private const int MIN_INT = -1000;
-        private const int MAX_INT = 1000;
         private static System.Random rng = new System.Random(), rng2 = new System.Random();
 
         public static int randomNumber(int min, int max)

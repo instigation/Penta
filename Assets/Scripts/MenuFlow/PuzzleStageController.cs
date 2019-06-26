@@ -185,7 +185,7 @@ public class PuzzleStageController : MonoBehaviour {
     {
         GameObject ret = Instantiate(__clearText);
         ret.transform.SetParent(__canvas.transform, false);
-        UnityUtils.moveUIElementToPosition(ret, UnityUtils.getAnchoredPositionOfUIElement(__clearTextInstantiationPosition));
+        UnityUtils.moveUIElementToAnchoredPosition(ret, UnityUtils.getAnchoredPositionOfUIElement(__clearTextInstantiationPosition));
     }
     private bool isGameOvered()
     {
