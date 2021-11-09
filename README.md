@@ -5,6 +5,9 @@
 * Google Play Store: https://play.google.com/store/apps/details?id=com.easyroad.penta
 * App Store: https://apps.apple.com/kr/app/ed-8e-9c-ed-83-80-ec-bd-a4-eb-b3-b4-ed-8d-bc-ec-a6-90/id1464474055
 
+# Demo
+demo.mp4 를 확인해주세요.
+
 # Contribution
 기획, 리소스, 랭킹 구현은 제 친구가, 나머지의 거의 모든 코드는 제가 작성했습니다.
 
