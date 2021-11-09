@@ -12,6 +12,6 @@ demo.mp4 를 확인해주세요.
 기획, 리소스, 랭킹 구현은 제 친구가, 나머지의 거의 모든 코드는 제가 작성했습니다.
 
 # How to run
-* Unity 2018.3.8f1 혹은 이후 버전 설치
+* Unity 2021.2.1f1 버전 설치
 * Unity의 File > Build Settings에서 Android 선택
 * Assets/Scenes에서 Stage 선택
